@@ -1,3 +1,12 @@
+// Compilar:
+// gcc -o parsim parsim.c -lm -fopenmp
+// Ex para executar:
+// ./parsim 1 2 3 10 1
+// Resultado suposto dar:
+// 1.570 0.056
+// 0
+
+
 #define _USE_MATH_DEFINES
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,6 +44,7 @@ void init_r4uni(int input_seed)
 {
     seed = input_seed + 987654321;
 }
+
 double rnd_uniform01()
 {
     int seed_in = seed;
@@ -43,6 +53,7 @@ double rnd_uniform01()
     seed ^= (seed << 5);
     return 0.5 + 0.2328306e-09 * (seed_in + (int) seed);
 }
+
 double rnd_normal01()
 {
     double u1, u2, z, result;
@@ -156,24 +167,27 @@ int process_collisions_in_cell_(particle_t* particles, int* indices, int count, 
     return collision_count;
 }
 
-int simulation(double space_size, long grid_size, long long num_particles, double num_timesteps, particle_t *par){
+int simulation(double space_size, long grid_size, long long num_particles, long long num_timesteps, particle_t *par){
     
-    center_mass cm[grid_size][grid_size]; //(line vs columns)
-    int grid_x; //position x of the particle that we want to calculate the forces exerted
-    int grid_y; //position y of the particle that we want to calculate the forces exerted
+    center_mass ** cm; //(line vs columns)
+    int grid_x, grid_y; //position x and y of the particle that we want to calculate the forces exerted
     double distance_cell = 0; //distance to the particles in the same cell
     double distance_cm = 0; //distance to the center of mass of the other cells
-    int position_x; //position of the other particles in the grid
-    int position_y; //position of the other particles in the grid
-    double delta_x = 0; //displacement of the particle in x 
-    double delta_y = 0; //displacement of the particle in y
-    double rx = 0; //direction along x
-    double ry = 0; //direction along y
+    int position_x, position_y; //position of the other particles in the grid
+    double delta_x = 0, delta_y = 0; //displacement of the particle in x and y
+    double rx = 0, ry = 0; //direction along x and y
     int number_collisions; //number of collisions
+
+    // Allocation of memory to save the center of mass of each cell
+    cm = malloc(grid_size * sizeof(center_mass*));
+    for (int i=0; i < grid_size; i++){
+        cm[i] = malloc(grid_size * sizeof(center_mass));
+    }
     
+    // Simulation loop
     for(int i = 0; i < num_timesteps; i++){
 
-        calc_center_mass(cm, num_particles, par, space_size, grid_size); // Compute the center  mass at the current instant for every cell
+        calc_center_mass(cm, num_particles, par, space_size, grid_size); // Compute the center of mass at the current instant for every cell
 
         if (i > 0) {
             for (int gx = 0; gx < grid_size; gx++) {
@@ -209,7 +223,6 @@ int simulation(double space_size, long grid_size, long long num_particles, doubl
             
             if(par[j].alive == 1){
 
-                
                 par[j].Fx = 0;
                 par[j].Fy = 0;
 
@@ -218,6 +231,7 @@ int simulation(double space_size, long grid_size, long long num_particles, doubl
                 int* cell_particles = malloc(num_particles * sizeof(int));
                 int count = 0;
                 int alive_count = 0;
+
                 for(int k; k < num_particles; k++){
                     if(k == j){
                         continue;
@@ -225,14 +239,14 @@ int simulation(double space_size, long grid_size, long long num_particles, doubl
                     position_x = par[k].x / (space_size/grid_size);
                     position_y = par[k].y / (space_size/grid_size);
 
-                    if(position_x == grid_x && position_y == grid_y){
-                        distance_cell = sqrt(pow((par[j].x - par[k].x),2)+pow((par[j].y-par[k].y),2));
+                    if(position_x == grid_x && position_y == grid_y){   // Tenho quase a certeza que isto pode ser simplificado para:
+                        distance_cell = sqrt(pow((par[j].x - par[k].x),2)+pow((par[j].y-par[k].y),2));  // Esta linha desaparece
                         delta_x = position_x - grid_x;
                         delta_y = position_y - grid_y;
-                        rx = delta_x/distance_cell;
-                        ry = delta_y/distance_cell;
-                        par[j].Fx += G*((par[k].m*par[j].m)/(pow(distance_cell,2)))*rx;
-                        par[j].Fy += G*((par[k].m*par[j].m)/(pow(distance_cell,2)))*ry;
+                        rx = delta_x/distance_cell;     // Esta linha desaparece
+                        ry = delta_y/distance_cell;     // Esta linha desaparece
+                        par[j].Fx += G*((par[k].m*par[j].m)/(pow(distance_cell,2)))*rx;     // par[j].Fx += G*((par[k].m*par[j].m)/(pow(delta_x,2)));
+                        par[j].Fy += G*((par[k].m*par[j].m)/(pow(distance_cell,2)))*ry;     // par[j].Fx += G*((par[k].m*par[j].m)/(pow(delta_y,2)));
                         }
                 }
 
@@ -262,10 +276,15 @@ int simulation(double space_size, long grid_size, long long num_particles, doubl
                 par[j].y = par[j].y + par[j].vy*DELTAT + 0.5*par[j].ay*pow(DELTAT,2); //calculate new position y
 
             }      
-        }    
+        }
+
+        printf("x: %.4f ; y: %.4f",par[0].x, par[0].y);    
     }
 
+    for(int i=0; i < grid_size; i++)
+        free(cm[i]);
     free(cm);
+
     return number_collisions;
 
 }
@@ -284,15 +303,24 @@ int main(int argc, char *argv[])
     double space_size = atof(argv[2]);
     long grid_size = atol(argv[3]);
     long long num_particles = atoll(argv[4]);
-    double num_timesteps = atof(argv[5]);
+    long long num_timesteps = atof(argv[5]);
     
     particle_t* particles = malloc(num_particles * sizeof(particle_t));
     
+    fprintf(stderr, "Generating initial state...\n");
     init_particles(seed, space_size, grid_size, num_particles, particles);
+    
+    fprintf(stderr, "Starting Simulation...\n");
     exec_time = -omp_get_wtime();
+    
     simulation(space_size, grid_size, num_particles, num_timesteps, particles);
+    
     exec_time += omp_get_wtime();
+    fprintf(stderr, "Simulation ended.\n");
+
     fprintf(stderr, "%.1fs\n", exec_time);
-    print_result();
+    
+    //print_result();
+    
     free(particles);
 }
