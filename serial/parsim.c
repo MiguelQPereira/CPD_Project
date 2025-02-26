@@ -90,6 +90,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parti
         par[i].vy = (rnd01() - 0.5) * side / ncside / 5.0;
 
         par[i].m = rnd01() * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
+        printf("Particle %lld: mass = %f x:%.6f y: %.6f vx: %.6f ; vy: %.6f \n",i,par[i].m,par[i].x,par[i].y, par[i].vx, par[i].vy);
         par[i].alive = 1; //all particles begin alive
     }
 }
@@ -113,7 +114,7 @@ void calc_center_mass(center_mass ** cm, long long num_particles,particle_t* par
         double grid_x_aux = par[i].x / cell_size;
         grid_x = (int) grid_x_aux; 
     
-        double grid_y_aux = par[i].y/ cell_size;
+        double grid_y_aux = par[i].y / cell_size;
         grid_y = (int) grid_y_aux;
 
         cm[grid_x][grid_y].M += par[i].m;
@@ -161,12 +162,17 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
     
     // Simulation loop
     for(int i = 0; i < num_timesteps; i++){
+        printf("t = %d\n",i);
         calc_center_mass(cm, num_particles, par, space_size, grid_size); // Compute the center of mass at the current instant for every cell
+        
+        for (int j=0; j<num_particles; j++){
+            par[j].Fx = 0;
+            par[j].Fy = 0;
+        }
+
         for(int j = 0; j < num_particles; j++){
 
-            if(par[j].alive = 1){
-                par[j].Fx = 0;
-                par[j].Fy = 0;
+            if(par[j].alive == 1){
 
                 double grid_x_aux = par[j].x / cell_size;
                 grid_x = (int) grid_x_aux; 
@@ -174,45 +180,55 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                 double grid_y_aux = par[j].y/ cell_size;
                 grid_y = (int) grid_y_aux;
                 
-                for(int k = 0; k < num_particles; k++){
+                for(int k = j+1; k < num_particles; k++){
+                    if (par[k].alive == 1){
+                        double pos_x_aux = par[k].x / cell_size;
+                        position_x = (int) pos_x_aux; 
+                    
+                        double pos_y_aux = par[k].y/ cell_size;
+                        position_y = (int) pos_y_aux;
 
-                    if(k == j){
-                        continue;
-                    }
+                        if(position_x == grid_x && position_y == grid_y){ 
+                            delta_x = par[k].x - par[j].x;
+                            delta_y = par[k].y - par[j].y;
+                            double distance2 = delta_x * delta_x + delta_y * delta_y;  // r^2
+                            double distance = sqrt(distance2);  // r
+                            double distance3 = distance2 * distance; //sqrt(pow((par[j].x - par[k].x),2)+pow((par[j].y-par[k].y),2));
+                            //printf("DISTANCIA :  %f\n", distance_cell);
 
-                    double pos_x_aux = par[k].x / cell_size;
-                    position_x = (int) pos_x_aux; 
-                
-                    double pos_y_aux = par[k].y/ cell_size;
-                    position_y = (int) pos_y_aux;
-
-                    if(position_x == grid_x && position_y == grid_y){ 
-                        delta_x = par[j].x - par[k].x;
-                        delta_y = par[j].y - par[k].y;
-                        distance_cell = delta_x*delta_x + delta_y*delta_y; //sqrt(pow((par[j].x - par[k].x),2)+pow((par[j].y-par[k].y),2));
-                        //printf("DISTANCIA :  %f\n", distance_cell);
-
-                        if(distance_cell <= EPSILON2){
-                            if (colisao_count < num_particles) {
-                                colision[colisao_count].a = j;
-                                colision[colisao_count].b = k;
-                                colisao_count++;
+                            if(distance2 <= EPSILON2){
+                                if (colisao_count < num_particles) {
+                                    colision[colisao_count].a = j;
+                                    colision[colisao_count].b = k;
+                                    printf("Colision: %d %d\n", j,k);
+                                    colisao_count++;
+                                }
+                                continue;
                             }
-                            continue;
+                            //rx = delta_x/distance_cell;
+                            //ry = delta_y/distance_cell;     
+                            double force = G * (par[k].m * par[j].m) / distance3;  // G * m1 * m2 / r^3
+
+                            if( j==0 && k==7){
+                                printf("P0/P7: mag: %.6f fx: %.6f fy: %.6f\n", force*distance, force * delta_x, force * delta_y);
+                            }
+
+                            par[j].Fx += force * delta_x;
+                            par[j].Fy += force * delta_y;
+
+
+                            par[k].Fx -= par[j].Fx;
+                            par[k].Fy -= par[j].Fy;
+                            //printf("x:%d y: %d Fx: %.6f ; Fy: %.6f \n",j,k, par[k].Fx, par[k].Fy);
+                            //printf("Fx: %.5f ; Fy: %.5f \n",par[j].Fx, par[j].Fy);
                         }
-                        //rx = delta_x/distance_cell;
-                        //ry = delta_y/distance_cell;     
-                        par[j].Fx += G*(par[k].m*par[j].m)/(distance_cell)*delta_x;     // par[j].Fx += G*((par[k].m*par[j].m)/(pow(delta_x,2)));
-                        par[j].Fy += G*(par[k].m*par[j].m)/(distance_cell)*delta_y;     // par[j].Fx += G*((par[k].m*par[j].m)/(pow(delta_y,2)));
-                        //par[k].Fx -= par[j].Fx;
-                        //par[k].Fy -= par[j].Fy;
                     }
                 }
                 
-                
+                // Force component from the centers of mass
                 for(int w =-1; w<2; w++){
                     for(int y =-1; y<2; y++){
-                        if(w==y && w== 0){
+                        if(y==0 && w== 0){  // Skip the cell of the particle
                             //printf("aqui");
                             continue;
                         }
@@ -220,56 +236,86 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                         int cell_x = grid_x + w;
                         int cell_y = grid_y + y;
 
-                        
+                        double x_aux, y_aux;
 
-                        if(cell_x<0)
+                        if(cell_x<0){
                             cell_x = (int) grid_size-1;
-                        
-                        if(cell_y<0)
-                            cell_y = (int) grid_size-1;
-
-                        if(cell_x = (int) grid_size)
+                        }else if(cell_x >= (int) grid_size){
                             cell_x = 0;
-                        
-                        if(cell_y = (int)grid_size)
+                        }
+
+                        if(cell_y<0){
+                            cell_y = (int) grid_size-1;
+                        }else if(cell_y >= (int)grid_size){
                             cell_y = 0;
+                        }
 
-                        delta_x = cm[cell_x][cell_y].X - par[j].x;
-                        delta_y = cm[cell_x][cell_y].Y - par[j].y;
-                        distance_cm = delta_x*delta_x + delta_y*delta_y; //sqrt(pow((par[j].x - cm[cell_x][cell_y].X),2)+pow((par[j].y-cm[cell_x][cell_y].Y),2));
-                        //rx = delta_x/distance_cm;
-                        //ry = delta_y/distance_cm;
-                        par[j].Fx += G*(cm[cell_x][cell_y].M*par[j].m)/(distance_cm)*delta_x;
-                        par[j].Fy += G*(cm[cell_x][cell_y].M*par[j].m)/(distance_cm)*delta_y;
+                        if(grid_x - cell_x < -1){
+                            x_aux = cm[cell_x][cell_y].X - space_size;
+                        }else if(grid_x - cell_x > 1){
+                            x_aux = cm[cell_x][cell_y].X + space_size;
+                        }else{
+                            x_aux = cm[cell_x][cell_y].X;
+                        }
+                        
 
-                    }
+                        if(grid_y - cell_y < -1){
+                            y_aux = cm[cell_x][cell_y].Y - space_size;
+                        }else if(grid_y - cell_y > 1){
+                            y_aux = cm[cell_x][cell_y].Y + space_size;
+                        }else{
+                            y_aux = cm[cell_x][cell_y].Y;
+                        }
+                        //printf("[%d][%d]",cell_x,cell_y);
+
+                        delta_x = x_aux - par[j].x;
+                        delta_y = y_aux - par[j].y;
+
+                        //delta_x = fmin(fabs(delta_x), grid_size - fabs(delta_x)) * (delta_x < 0 ? -1 : 1);
+                        //delta_y = fmin(fabs(delta_y), grid_size - fabs(delta_y)) * (delta_y < 0 ? -1 : 1);
+
+                        double distance2_cm = delta_x * delta_x + delta_y * delta_y;  // r^2
+                        double distance_cm = sqrt(distance2_cm);  // r
+                        double distance3_cm = distance2_cm * distance_cm;  // r^3
+
+                        double force = G * (cm[cell_x][cell_y].M * par[j].m) / distance3_cm;  // G * M * m / r^3
+
+                        par[j].Fx += force * delta_x;
+                        par[j].Fy += force * delta_y;
+
+                        if(j==0)
+                            printf("C[%d][%d]  Fx: %.6f  Fy: %.6f \n", cell_x, cell_y, force * delta_x, force * delta_y);
+                        
+                        //printf("x:%d y: %dFx: %.6f ; Fy: %.6f \n",cell_x,cell_y, par[0].Fx, par[0].Fy);
+                    } 
                 } 
-                
-                par[j].ax = par[j].Fx/par[j].m; 
-                par[j].ay = par[j].Fy/par[j].m;
-                par[j].vx = par[j].vx + par[j].ax*DELTAT; //calculate new velocity along x
-                par[j].vy = par[j].vy + par[j].ay*DELTAT; //calculate new velocity along y
-                par[j].x = par[j].x + par[j].vx*DELTAT + 0.5*par[j].ax*pow(DELTAT,2); //calculate new position x
-                par[j].y = par[j].y + par[j].vy*DELTAT + 0.5*par[j].ay*pow(DELTAT,2); //calculate new position y
-                
-                //erro está aqui
+                //printf(" x: %.6f ; y: %.6f \n", par[j].x, par[j].y);
+            }
 
-                if(par[j].x<0)
-                    par[j].x = space_size + par[j].x;
+            par[j].ax = par[j].Fx/par[j].m; 
+            par[j].ay = par[j].Fy/par[j].m;
+            par[j].x = par[j].x + par[j].vx*DELTAT + 0.5*par[j].ax*pow(DELTAT,2); //calculate new position x
+            par[j].y = par[j].y + par[j].vy*DELTAT + 0.5*par[j].ay*pow(DELTAT,2); //calculate new position y
+            par[j].vx = par[j].vx + par[j].ax*DELTAT; //calculate new velocity along x
+            par[j].vy = par[j].vy + par[j].ay*DELTAT; //calculate new velocity along y
+
+            if(par[j].x<0)
+                par[j].x = space_size + par[j].x;
+    
+            if(par[j].y<0)
+                par[j].y = space_size + par[j].y;
+
+            if(par[j].x > space_size)
+                par[j].x = par[j].x - space_size;
             
-                if(par[j].y<0)
-                    par[j].y = space_size + par[j].y;
-
-                if(par[j].x > space_size)
-                    par[j].x = par[j].x - space_size;
-                
-                if(par[j].y > space_size){
-                   par[j].y = par[j].y - space_size;
-                   printf("y: %f\n",par[0].y);
-                }
+            if(par[j].y > space_size){
+                par[j].y = par[j].y - space_size;
+                //printf("y: %f\n",par[0].y);
             }
             
-        //printf("x: %.3f ; y: %.3f \n",par[0].x, par[0].y);
+            printf("Particle %d: mass = %f x:%.6f y: %.6f vx: %.6f ; vy: %.6f \n",j,par[j].m,par[j].x,par[j].y, par[j].vx, par[j].vy);
+            
+        
         }
 
         for(int n=0; n<colisao_count; n++){
@@ -277,14 +323,13 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
             par[colision[n].b].alive = 0;
             for(int m=n+1; m<colisao_count; m++){
                 if(colision[n].b == colision[m].a){
-                    colisao_count--;
-                        
+                    colisao_count--;    
                 }
             }
         }
           
         
-        //printf("Colisions: %d \n", colisao_count);
+        printf("Colisions: %d \n", colisao_count);
     }
     
     for(int i=0; i < grid_size; i++)
@@ -301,8 +346,7 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
     printf("Colisions: %d \n", collisions);
 } */
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
     //read args values
     double exec_time;
     
