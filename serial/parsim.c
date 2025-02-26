@@ -105,11 +105,16 @@ void calc_center_mass(center_mass ** cm, long long num_particles,particle_t* par
     for(int i=0; i<grid_size;i++){
         for(int j=0; j<grid_size; j++){
             cm[i][j].M = 0;
+            cm[i][j].X = 0;
+            cm[i][j].Y = 0;
         }
     }
 
     // Compute the M of each cell
     for(int i = 0; i< num_particles; i++){
+
+        if (par[i].alive == 0)
+            continue;
 
         double grid_x_aux = par[i].x / cell_size;
         grid_x = (int) grid_x_aux; 
@@ -194,19 +199,7 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                             double distance2 = delta_x * delta_x + delta_y * delta_y;  // r^2
                             double distance = sqrt(distance2);  // r
                             double distance3 = distance2 * distance; //sqrt(pow((par[j].x - par[k].x),2)+pow((par[j].y-par[k].y),2));
-                            //printf("DISTANCIA :  %f\n", distance_cell);
-
-                            if(distance2 <= EPSILON2){
-                                if (colisao_count < num_particles) {
-                                    colision[colisao_count].a = j;
-                                    colision[colisao_count].b = k;
-                                    printf("Colision: %d %d\n", j,k);
-                                    colisao_count++;
-                                }
-                                continue;
-                            }
-                            //rx = delta_x/distance_cell;
-                            //ry = delta_y/distance_cell;     
+                               
                             double force = G * (par[k].m * par[j].m) / distance3;  // G * m1 * m2 / r^3
 
                             if( j==0 && k==7){
@@ -290,45 +283,66 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                     } 
                 } 
                 //printf(" x: %.6f ; y: %.6f \n", par[j].x, par[j].y);
+
+
+                par[j].ax = par[j].Fx/par[j].m; 
+                par[j].ay = par[j].Fy/par[j].m;
+                par[j].x = par[j].x + par[j].vx*DELTAT + 0.5*par[j].ax*DELTAT*DELTAT; //calculate new position x
+                par[j].y = par[j].y + par[j].vy*DELTAT + 0.5*par[j].ay*DELTAT*DELTAT; //calculate new position y
+                par[j].vx = par[j].vx + par[j].ax*DELTAT; //calculate new velocity along x
+                par[j].vy = par[j].vy + par[j].ay*DELTAT; //calculate new velocity along y  
+
+                if(par[j].x<0)
+                    par[j].x = space_size + par[j].x;
+        
+                if(par[j].y<0)
+                    par[j].y = space_size + par[j].y;
+
+                if(par[j].x > space_size)
+                    par[j].x = par[j].x - space_size;
+                
+                if(par[j].y > space_size){
+                    par[j].y = par[j].y - space_size;
+                    //printf("y: %f\n",par[0].y);
+                }
+               
             }
-
-            par[j].ax = par[j].Fx/par[j].m; 
-            par[j].ay = par[j].Fy/par[j].m;
-            par[j].x = par[j].x + par[j].vx*DELTAT + 0.5*par[j].ax*pow(DELTAT,2); //calculate new position x
-            par[j].y = par[j].y + par[j].vy*DELTAT + 0.5*par[j].ay*pow(DELTAT,2); //calculate new position y
-            par[j].vx = par[j].vx + par[j].ax*DELTAT; //calculate new velocity along x
-            par[j].vy = par[j].vy + par[j].ay*DELTAT; //calculate new velocity along y
-
-            if(par[j].x<0)
-                par[j].x = space_size + par[j].x;
-    
-            if(par[j].y<0)
-                par[j].y = space_size + par[j].y;
-
-            if(par[j].x > space_size)
-                par[j].x = par[j].x - space_size;
-            
-            if(par[j].y > space_size){
-                par[j].y = par[j].y - space_size;
-                //printf("y: %f\n",par[0].y);
-            }
-            
             printf("Particle %d: mass = %f x:%.6f y: %.6f vx: %.6f ; vy: %.6f \n",j,par[j].m,par[j].x,par[j].y, par[j].vx, par[j].vy);
             
         
         }
 
+        for(int k=0; k<num_particles; k++){
+            for(int w = k+1; w<num_particles; w++){
+                if ( par[k].alive == 0 || par[w].alive == 0)
+                    continue;
+
+                delta_x = par[k].x - par[w].x;
+                delta_y = par[k].y - par[w].y;
+                double distance2 = delta_x * delta_x + delta_y * delta_y;  // r^2
+
+                if(distance2 <= EPSILON2){
+                    if (colisao_count < num_particles) {
+                        colision[colisao_count].a = k;
+                        colision[colisao_count].b = w;
+                        printf("t = %d Colision: %d %d\n", i, k,w);
+                        colisao_count++;
+                    }
+                    continue;
+                }  
+            }
+        }    
+
         for(int n=0; n<colisao_count; n++){
             par[colision[n].a].alive = 0;
             par[colision[n].b].alive = 0;
-            for(int m=n+1; m<colisao_count; m++){
-                if(colision[n].b == colision[m].a){
-                    colisao_count--;    
-                }
+        for(int m=n+1; m<colisao_count; m++){
+            if(colision[n].b == colision[m].a){
+                colisao_count--;
             }
         }
-          
         
+        }
         printf("Colisions: %d \n", colisao_count);
     }
     
