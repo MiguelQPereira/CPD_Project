@@ -192,118 +192,118 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
         for(int idx_x = 0; idx_x < grid_size; idx_x++){
             for(int idx_y = 0; idx_y < grid_size; idx_y++){                
 
-            for(int j = 0; cm[idx_x][idx_y].par_index[j] > -1; j++){
+                for(int j = 0; cm[idx_x][idx_y].par_index[j] > -1; j++){
 
-                int px = cm[idx_x][idx_y].par_index[j];
+                    int px = cm[idx_x][idx_y].par_index[j];
 
-                if(par[px].alive == 1){
+                    if(par[px].alive == 1){
 
 
-                    for(int k = j+1; cm[idx_x][idx_y].par_index[k] > -1; k++){
-                        int py = cm[idx_x][idx_y].par_index[k];
+                        for(int k = j+1; cm[idx_x][idx_y].par_index[k] > -1; k++){
+                            int py = cm[idx_x][idx_y].par_index[k];
 
-                        if (par[py].alive == 1){
+                            if (par[py].alive == 1){
 
-                            delta_x = par[py].x - par[px].x;
-                            delta_y = par[py].y - par[px].y;
-                            double distance2 = delta_x * delta_x + delta_y * delta_y;
-                            double distance = sqrt(distance2); 
-                            double distance3 = distance2 * distance;
-                            
-                            double force = G * (par[py].m * par[px].m) / distance3;
+                                delta_x = par[py].x - par[px].x;
+                                delta_y = par[py].y - par[px].y;
+                                double distance2 = delta_x * delta_x + delta_y * delta_y;
+                                double distance = sqrt(distance2); 
+                                double distance3 = distance2 * distance;
+                                
+                                double force = G * (par[py].m * par[px].m) / distance3;
 
-                            par[px].Fx += force * delta_x;
-                            par[px].Fy += force * delta_y;
+                                par[px].Fx += force * delta_x;
+                                par[px].Fy += force * delta_y;
 
-                            par[py].Fx -= par[px].Fx;
-                            par[py].Fy -= par[px].Fy;
-    
+                                par[py].Fx -= par[px].Fx;
+                                par[py].Fy -= par[px].Fy;
+        
+                            }
                         }
-                    }
-                    
-                    // Force component from the centers of mass
-                    for(int w =-1; w<2; w++){
-                        for(int y =-1; y<2; y++){
-                            if(y==0 && w== 0){  // Skip the cell of the particle
-                                continue;
-                            }
+                        
+                        // Force component from the centers of mass
+                        for(int w =-1; w<2; w++){
+                            for(int y =-1; y<2; y++){
+                                if(y==0 && w== 0){  // Skip the cell of the particle
+                                    continue;
+                                }
 
-                            int cell_x = idx_x + w;
-                            int cell_y = idx_y + y;
+                                int cell_x = idx_x + w;
+                                int cell_y = idx_y + y;
 
-                            double x_aux, y_aux;
+                                double x_aux, y_aux;
 
-                            if(cell_x<0){
-                                cell_x = (int) grid_size-1;
-                            }else if(cell_x >= (int) grid_size){
-                                cell_x = 0;
-                            }
+                                if(cell_x<0){
+                                    cell_x = (int) grid_size-1;
+                                }else if(cell_x >= (int) grid_size){
+                                    cell_x = 0;
+                                }
 
-                            if(cell_y<0){
-                                cell_y = (int) grid_size-1;
-                            }else if(cell_y >= (int)grid_size){
-                                cell_y = 0;
-                            }
+                                if(cell_y<0){
+                                    cell_y = (int) grid_size-1;
+                                }else if(cell_y >= (int)grid_size){
+                                    cell_y = 0;
+                                }
 
-                            if(idx_x - cell_x < -1){
-                                x_aux = cm[cell_x][cell_y].X - space_size;
-                            }else if(idx_x - cell_x > 1){
-                                x_aux = cm[cell_x][cell_y].X + space_size;
-                            }else{
-                                x_aux = cm[cell_x][cell_y].X;
-                            }
-                            
+                                if(idx_x - cell_x < -1){
+                                    x_aux = cm[cell_x][cell_y].X - space_size;
+                                }else if(idx_x - cell_x > 1){
+                                    x_aux = cm[cell_x][cell_y].X + space_size;
+                                }else{
+                                    x_aux = cm[cell_x][cell_y].X;
+                                }
+                                
 
-                            if(idx_y - cell_y < -1){
-                                y_aux = cm[cell_x][cell_y].Y - space_size;
-                            }else if(idx_y - cell_y > 1){
-                                y_aux = cm[cell_x][cell_y].Y + space_size;
-                            }else{
-                                y_aux = cm[cell_x][cell_y].Y;
-                            }
+                                if(idx_y - cell_y < -1){
+                                    y_aux = cm[cell_x][cell_y].Y - space_size;
+                                }else if(idx_y - cell_y > 1){
+                                    y_aux = cm[cell_x][cell_y].Y + space_size;
+                                }else{
+                                    y_aux = cm[cell_x][cell_y].Y;
+                                }
 
-                            delta_x = x_aux - par[px].x;
-                            delta_y = y_aux - par[px].y;
+                                delta_x = x_aux - par[px].x;
+                                delta_y = y_aux - par[px].y;
 
 
-                            double distance2_cm = delta_x * delta_x + delta_y * delta_y;  // r^2
-                            double distance_cm = sqrt(distance2_cm);
-                            double distance3_cm = distance2_cm * distance_cm;
+                                double distance2_cm = delta_x * delta_x + delta_y * delta_y;  // r^2
+                                double distance_cm = sqrt(distance2_cm);
+                                double distance3_cm = distance2_cm * distance_cm;
 
-                            double force = G * (cm[cell_x][cell_y].M * par[px].m) / distance3_cm;  // G * M * m / r^3
+                                double force = G * (cm[cell_x][cell_y].M * par[px].m) / distance3_cm;  // G * M * m / r^3
 
-                            par[px].Fx += force * delta_x;
-                            par[px].Fy += force * delta_y;
+                                par[px].Fx += force * delta_x;
+                                par[px].Fy += force * delta_y;
 
-                            //if(px==0)
-                                //printf("C[%d][%d]  Fx: %.6f  Fy: %.6f \n", cell_x, cell_y, force * delta_x, force * delta_y);
-                            
+                                //if(px==0)
+                                    //printf("C[%d][%d]  Fx: %.6f  Fy: %.6f \n", cell_x, cell_y, force * delta_x, force * delta_y);
+                                
+                            } 
                         } 
-                    } 
 
-                    par[px].ax = par[px].Fx/par[px].m; 
-                    par[px].ay = par[px].Fy/par[px].m;
-                    par[px].x = par[px].x + par[px].vx*DELTAT + 0.5*par[px].ax*DELTAT*DELTAT; //calculate new position x
-                    par[px].y = par[px].y + par[px].vy*DELTAT + 0.5*par[px].ay*DELTAT*DELTAT; //calculate new position y
-                    par[px].vx = par[px].vx + par[px].ax*DELTAT; //calculate new velocity along x
-                    par[px].vy = par[px].vy + par[px].ay*DELTAT; //calculate new velocity along y  
-                    
-                    if(par[px].x<0)
-                        par[px].x = space_size + par[px].x;
-            
-                    if(par[px].y<0)
-                        par[px].y = space_size + par[px].y;
+                        par[px].ax = par[px].Fx/par[px].m; 
+                        par[px].ay = par[px].Fy/par[px].m;
+                        par[px].x = par[px].x + par[px].vx*DELTAT + 0.5*par[px].ax*DELTAT*DELTAT; //calculate new position x
+                        par[px].y = par[px].y + par[px].vy*DELTAT + 0.5*par[px].ay*DELTAT*DELTAT; //calculate new position y
+                        par[px].vx = par[px].vx + par[px].ax*DELTAT; //calculate new velocity along x
+                        par[px].vy = par[px].vy + par[px].ay*DELTAT; //calculate new velocity along y  
+                        
+                        if(par[px].x<0)
+                            par[px].x = space_size + par[px].x;
+                
+                        if(par[px].y<0)
+                            par[px].y = space_size + par[px].y;
 
-                    if(par[px].x > space_size)
-                        par[px].x = par[px].x - space_size;
-                    
-                    if(par[px].y > space_size)
-                        par[px].y = par[px].y - space_size;
+                        if(par[px].x > space_size)
+                            par[px].x = par[px].x - space_size;
+                        
+                        if(par[px].y > space_size)
+                            par[px].y = par[px].y - space_size;
 
+                    }
+                    //printf("Particle %d: mass = %f x:%.6f y: %.6f vx: %.6f ; vy: %.6f \n",px, par[px].m,par[px].x,par[px].y, par[px].vx, par[px].vy);
+                
                 }
-                //printf("Particle %d: mass = %f x:%.6f y: %.6f vx: %.6f ; vy: %.6f \n",px, par[px].m,par[px].x,par[px].y, par[px].vx, par[px].vy);
-            
-            }
                 
             }
         }
