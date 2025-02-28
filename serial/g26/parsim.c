@@ -378,7 +378,7 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     
     print_result(particles[0].x, particles[0].y, colisions);
-    fprintf(stderr, "%.1fs\n", exec_time);
+    fprintf(stderr, "%.fs\n", exec_time);
     
     free(particles);
 }
