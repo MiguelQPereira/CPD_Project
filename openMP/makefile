@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -lm -fopenmp -O2 
+CFLAGS = -lm -fopenmp -O2 -g
 
 all: parsim 
 
