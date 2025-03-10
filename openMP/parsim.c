@@ -240,7 +240,6 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
 
                     if(par[px].alive == 1){
 
-
                         for(int k = j+1; cm[idx_x][idx_y].par_index[k] > -1; k++){
                             int py = cm[idx_x][idx_y].par_index[k];
 
@@ -254,11 +253,14 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                                 
                                 double force = G * (par[py].m * par[px].m) / distance3;
                                 
-                                
+                                #pragma omp atomic
                                 par[px].Fx += force * delta_x;
+                                #pragma omp atomic
                                 par[px].Fy += force * delta_y;
 
+                                #pragma omp atomic
                                 par[py].Fx -= par[px].Fx;
+                                #pragma omp atomic
                                 par[py].Fy -= par[px].Fy;
         
                             }
@@ -315,7 +317,9 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
 
                                 double force = G * (cm[cell_x][cell_y].M * par[px].m) / distance3_cm;  // G * M * m / r^3
 
+                                #pragma omp atomic
                                 par[px].Fx += force * delta_x;
+                                #pragma omp atomic
                                 par[px].Fy += force * delta_y;
                                 
                             } 
