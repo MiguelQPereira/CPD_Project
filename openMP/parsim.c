@@ -85,6 +85,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parti
 
         par[i].m = rnd01() * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
         par[i].alive = 1; //all particles begin alive
+        printf("mass = %.6f x = %.6f y = %.6f vx = %.6f vy = %.6f\n",par[i].m,par[i].x,par[i].y,par[i].vx,par[i].vy);
     }
 }
 
@@ -226,13 +227,13 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
 
     //Simulation loop
     for(int i = 0; i < num_timesteps; i++){
-
+        printf("t = %d\n",i);
         calc_center_mass(cm, num_particles, par, cell_size, grid_size); // Compute the center of mass at the current instant for every cell
         
         #pragma omp parallel for private(delta_x, delta_y) collapse(2)
         for(int idx_x = 0; idx_x < grid_size; idx_x++){
             for(int idx_y = 0; idx_y < grid_size; idx_y++){  
-                num = omp_get_num_threads();              
+                //num = omp_get_num_threads();              
 
                 for(int j = 0; cm[idx_x][idx_y].par_index[j] > -1; j++){
 
@@ -345,6 +346,8 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                             par[px].y = par[px].y - space_size;
 
                     }
+
+                    printf("mass = %.6f x = %.6f y = %.6f vx = %.6f vy = %.6f\n",par[px].m,par[px].x,par[px].y,par[px].vx,par[px].vy);
                 
                 }
                 
