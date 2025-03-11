@@ -333,7 +333,7 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
             par[colision[n].a].alive = 0;
             par[colision[n].b].alive = 0;
         for(int m=n+1; m<collision_count; m++){
-            if(colision[n].b == colision[m].a){
+            if(colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a){
                 collision_count--;
             }
         }
