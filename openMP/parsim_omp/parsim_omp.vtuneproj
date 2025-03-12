@@ -29,10 +29,10 @@
        <targetName type="string">launch</targetName>
        <result_directory.path type="string">/home/quina/GIT/CPD_Project/openMP/parsim_omp/r@@@{at}</result_directory.path>
        <use_app_dir_as_work_dir type="bool">true</use_app_dir_as_work_dir>
-       <launch_app.app_to_launch type="string">/home/quina/GIT/CPD_Project/openMP/parsim</launch_app.app_to_launch>
-       <launch.userappworkdir type="string"></launch.userappworkdir>
-       <launch_app.app_parameters type="string">1 5000 20 100000 10</launch_app.app_parameters>
        <launch_app.environment type="string">OMP_NUM_THREADS=4</launch_app.environment>
+       <launch_app.app_to_launch type="string">/home/quina/GIT/CPD_Project/openMP/parsim</launch_app.app_to_launch>
+       <launch_app.app_parameters type="string">1 5000 100 1000000 100</launch_app.app_parameters>
+       <launch.userappworkdir type="string"></launch.userappworkdir>
        <launch_app.working_folder type="string">/home/quina/GIT/CPD_Project/openMP</launch_app.working_folder>
        <context>
         <contextValue>

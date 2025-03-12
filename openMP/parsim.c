@@ -10,7 +10,6 @@
 
 unsigned int seed;
 
-int num = 0;
 
 typedef struct particle_{
 
@@ -229,19 +228,27 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
 
         calc_center_mass(cm, num_particles, par, cell_size, grid_size); // Compute the center of mass at the current instant for every cell
         
-        #pragma omp parallel for private(delta_x, delta_y) collapse(2)
+        //#pragma omp parallel for private(delta_x, delta_y) collapse(2)
         for(int idx_x = 0; idx_x < grid_size; idx_x++){
             for(int idx_y = 0; idx_y < grid_size; idx_y++){  
-                num = omp_get_num_threads();              
-
-                for(int j = 0; cm[idx_x][idx_y].par_index[j] > -1; j++){
-
+           
+                int num_particles_in_cell = 0;
+                while (cm[idx_x][idx_y].par_index[num_particles_in_cell] != -1) {
+                    num_particles_in_cell++;
+                }
+                #pragma omp parallel for private(delta_x, delta_y)
+                for(int j = 0; j < num_particles_in_cell; j++){
                     int px = cm[idx_x][idx_y].par_index[j];
 
                     if(par[px].alive == 1){
-
-                        for(int k = j+1; cm[idx_x][idx_y].par_index[k] > -1; k++){
+                        double Fx_local = 0.0;
+                        double Fy_local = 0.0;
+            
+                        #pragma omp parallel for reduction(+:Fx_local, Fy_local) private(delta_x, delta_y)
+                        for(int k = 0; k < num_particles_in_cell; k++){
                             int py = cm[idx_x][idx_y].par_index[k];
+                            if(px==py)
+                                continue;
 
                             if (par[py].alive == 1){
 
@@ -252,19 +259,16 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                                 double distance3 = distance2 * distance;
                                 
                                 double force = G * (par[py].m * par[px].m) / distance3;
-                                
-                                #pragma omp atomic
-                                par[px].Fx += force * delta_x;
-                                #pragma omp atomic
-                                par[px].Fy += force * delta_y;
-
-                                #pragma omp atomic
-                                par[py].Fx -= par[px].Fx;
-                                #pragma omp atomic
-                                par[py].Fy -= par[px].Fy;
+                                Fx_local += force * delta_x;
+                                Fy_local += force * delta_y;
         
                             }
                         }
+                        #pragma omp atomic
+                        par[px].Fx += Fx_local;
+
+                        #pragma omp atomic
+                        par[px].Fy += Fy_local;
                         
                         // Force component from the centers of mass
                         for(int w =-1; w<2; w++){
@@ -316,7 +320,6 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                                 double distance3_cm = distance2_cm * distance_cm;
 
                                 double force = G * (cm[cell_x][cell_y].M * par[px].m) / distance3_cm;  // G * M * m / r^3
-
                                 #pragma omp atomic
                                 par[px].Fx += force * delta_x;
                                 #pragma omp atomic
@@ -370,7 +373,7 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                                 if (collision_count < num_particles) {
                                     colision[collision_count].a = cm[k][w].par_index[idx_a];
                                     colision[collision_count].b = cm[k][w].par_index[idx_b];
-                                    printf("t = %d Colision: %d %d\n", i, cm[k][w].par_index[idx_a],cm[k][w].par_index[idx_b]);
+                                    //printf("t = %d Colision: %d %d\n", i, cm[k][w].par_index[idx_a],cm[k][w].par_index[idx_b]);
                                     #pragma omp atomic
                                     collision_count++;
                                 }
@@ -432,7 +435,6 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     
     print_result(particles[0].x, particles[0].y, colisions);
-    printf("Number threads: %d\n",num);
     fprintf(stderr, "%.1fs\n", exec_time);
     
     free(particles);
