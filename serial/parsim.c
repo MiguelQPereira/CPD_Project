@@ -30,6 +30,7 @@ typedef struct cm_{
         double Y; //Y of center of mass
         double M; //sum of the mass of each particle
         int * par_index;
+        int n_par;
 }center_mass;
 
 typedef struct {
@@ -138,25 +139,27 @@ void grid_calculation(center_mass ** cm, long long num_particles, double cell_si
 
     for (int i=0; i< grid_size; i++){
         for (int j=0; j<grid_size; j++)
-            cm[i][j].par_index[0] = -1;
+            cm[i][j].n_par = 0;
     }
 
     for(int p =0; p<num_particles; p++){  
         
-        double grid_x_aux = par[p].x / cell_size;
-        int grid_x = (int) grid_x_aux; 
+        int n_local;
+        if (par[p].alive == 1){
+            double grid_x_aux = par[p].x / cell_size;
+            int grid_x = (int)grid_x_aux;
 
-        double grid_y_aux = par[p].y/ cell_size;
-        int grid_y = (int) grid_y_aux;
+            double grid_y_aux = par[p].y / cell_size;
+            int grid_y = (int)grid_y_aux;
 
-        int n = 0;
-
-        while (cm[grid_x][grid_y].par_index[n] > -1){
-            n++;
+                n_local = cm[grid_x][grid_y].n_par;
+                cm[grid_x][grid_y].n_par++;
+            
+            // Assign the particle index to the grid cell
+            cm[grid_x][grid_y].par_index[n_local] = p;
+            
+            
         }
-        
-        cm[grid_x][grid_y].par_index[n] = p;
-        cm[grid_x][grid_y].par_index[n+1] = -1;
     }
     
 }
@@ -175,7 +178,6 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
         cm[i] = malloc(grid_size * sizeof(center_mass));
         for (int j= 0; j<grid_size; j++){
             cm[i][j].par_index = malloc(num_particles * sizeof(int));
-            cm[i][j].par_index[0] = -1;
         }
     }
 
@@ -189,14 +191,14 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
         for(int idx_x = 0; idx_x < grid_size; idx_x++){
             for(int idx_y = 0; idx_y < grid_size; idx_y++){                
 
-                for(int j = 0; cm[idx_x][idx_y].par_index[j] > -1; j++){
+                for(int j = 0; j<cm[idx_x][idx_y].n_par; j++){
 
                     int px = cm[idx_x][idx_y].par_index[j];
 
                     if(par[px].alive == 1){
 
 
-                        for(int k = j+1; cm[idx_x][idx_y].par_index[k] > -1; k++){
+                        for(int k = j+1; k<cm[idx_x][idx_y].n_par; k++){
                             int py = cm[idx_x][idx_y].par_index[k];
 
                             if (par[py].alive == 1){
@@ -209,11 +211,14 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                                 
                                 double force = G * (par[py].m * par[px].m) / distance3;
 
-                                par[px].Fx += force * delta_x;
-                                par[px].Fy += force * delta_y;
+                                double fx = force * delta_x;
+                                double fy = force * delta_y;
 
-                                par[py].Fx -= par[px].Fx;
-                                par[py].Fy -= par[px].Fy;
+                                par[px].Fx += fx;
+                                par[px].Fy += fy;
+
+                                par[py].Fx -= fx;
+                                par[py].Fy -= fy;
         
                             }
                         }
@@ -306,8 +311,8 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
         for(int k=0; k<grid_size; k++){
             for(int w = 0; w<grid_size; w++){
 
-                    for (int idx_a=0; cm[k][w].par_index[idx_a] > -1; idx_a++){
-                        for (int idx_b=idx_a+1; cm[k][w].par_index[idx_b] > -1; idx_b++){
+                    for (int idx_a=0; idx_a < cm[k][w].n_par; idx_a++){
+                        for (int idx_b=idx_a+1; idx_b < cm[k][w].n_par; idx_b++){
                             if ( par[cm[k][w].par_index[idx_a]].alive == 0 || par[cm[k][w].par_index[idx_b]].alive == 0)
                                 continue;
                                 
