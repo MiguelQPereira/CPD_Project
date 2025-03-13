@@ -96,7 +96,7 @@ void calc_center_mass(center_mass ** cm, long long num_particles, particle_t* pa
     
     // Set M of each cell to 0
     #pragma omp parallel
-    #pragma omp for collapse(2) nowait
+    #pragma omp for schedule(dynamic, 10) collapse(2) nowait
         for(int i=0; i<grid_size;i++){
             for(int j=0; j<grid_size; j++){
                 cm[i][j].M = 0;
@@ -106,7 +106,8 @@ void calc_center_mass(center_mass ** cm, long long num_particles, particle_t* pa
         }
 
     // Compute the M of each cell
-    #pragma omp parallel for private(grid_x, grid_y) 
+    #pragma omp parallel
+    #pragma omp for schedule(dynamic, 10) private(grid_x, grid_y) nowait
         for(int i = 0; i< num_particles; i++){
 
             par[i].Fx = 0;
@@ -121,12 +122,12 @@ void calc_center_mass(center_mass ** cm, long long num_particles, particle_t* pa
             double grid_y_aux = par[i].y / cell_size;
             grid_y = (int) grid_y_aux;
 
-            #pragma omp atomic
-            cm[grid_x][grid_y].M += par[i].m;
-            #pragma omp atomic
-            cm[grid_x][grid_y].X += (par[i].m * par[i].x);
-            #pragma omp atomic
-            cm[grid_x][grid_y].Y += (par[i].m * par[i].y);
+            #pragma omp critical
+            {
+                cm[grid_x][grid_y].M += par[i].m;
+                cm[grid_x][grid_y].X += (par[i].m * par[i].x);
+                cm[grid_x][grid_y].Y += (par[i].m * par[i].y);
+            }
             
         }
 
@@ -150,19 +151,18 @@ void calc_center_mass(center_mass ** cm, long long num_particles, particle_t* pa
 
 void grid_calculation(center_mass ** cm, long long num_particles, double cell_size, particle_t *par, long grid_size){
 
-    //omp_set_nested(1);
-
-
     // Initialize par_index for each grid cell
-    #pragma omp parallel for collapse(2)
+    //#pragma omp parallel
+    #pragma omp parallel
+    #pragma omp for schedule(dynamic, 10) collapse(2) nowait //nowait
     for (int i = 0; i < grid_size; i++) {
         for (int j = 0; j < grid_size; j++) {
             cm[i][j].n_par = 0;
         }
     }
 
-    // Assign particles to grid cells
-    #pragma omp parallel for
+    #pragma omp parallel 
+    #pragma omp for nowait
     for (int p = 0; p < num_particles; p++) {
         int n_local;
         if (par[p].alive == 1){
@@ -184,12 +184,12 @@ void grid_calculation(center_mass ** cm, long long num_particles, double cell_si
         }
         
     }
-
+    
 }
 
 int simulation(double space_size, long grid_size, long long num_particles, long long num_timesteps, particle_t *par){
     
-    omp_set_nested(1);
+    //omp_set_nested(1);
     center_mass ** cm;
     double delta_x = 0, delta_y = 0; //displacement of the particle in x and y
     int collision_count = 0; //count collisions
@@ -202,6 +202,7 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
             cm[i] = malloc(grid_size * sizeof(center_mass));
             for (int j= 0; j<grid_size; j++){
                 cm[i][j].par_index = malloc(num_particles * sizeof(int));
+                cm[i][j].par_index[0] = -1;
             }
         }
 
@@ -212,47 +213,41 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
 
         calc_center_mass(cm, num_particles, par, cell_size, grid_size); // Compute the center of mass at the current instant for every cell
         
-        #pragma omp parallel for collapse(2)
+        #pragma omp parallel 
+        #pragma omp for private(delta_x, delta_y) schedule(dynamic, 10) collapse(2) nowait
         for(int idx_x = 0; idx_x < grid_size; idx_x++){
             for(int idx_y = 0; idx_y < grid_size; idx_y++){  
-                //num = omp_get_num_threads(); 
+                num = omp_get_num_threads();              
 
-                #pragma omp parallel for private(delta_x, delta_y) collapse(2)
-                for(int j = 0; j<cm[idx_x][idx_y].n_par; j++){
-                    for(int k = j+1; k<cm[idx_x][idx_y].n_par; k++){
-                        int py = cm[idx_x][idx_y].par_index[k];
-                        int px = cm[idx_x][idx_y].par_index[j];
-                        if (par[py].alive == 1 && par[px].alive == 1){
-
-                            delta_x = par[py].x - par[px].x;
-                            delta_y = par[py].y - par[px].y;
-                            double distance2 = delta_x * delta_x + delta_y * delta_y;
-                            double distance = sqrt(distance2); 
-                            double distance3 = distance2 * distance;
-                            
-                            double force = G * (par[py].m * par[px].m) / distance3;
-
-                            double fx = force * delta_x;
-                            double fy = force * delta_y;
-                            #pragma omp atomic
-                            par[px].Fx += fx;
-                            #pragma omp atomic
-                            par[px].Fy += fy;
-                            #pragma omp atomic
-                            par[py].Fx -= fx;
-                            #pragma omp atomic
-                            par[py].Fy -= fy;
-    
-                        }
-                    }
-
-                }
-                #pragma omp parallel for private(delta_x, delta_y)
                 for(int j = 0; j<cm[idx_x][idx_y].n_par; j++){
 
                     int px = cm[idx_x][idx_y].par_index[j];
 
                     if(par[px].alive == 1){
+                        for(int k = j+1; k<cm[idx_x][idx_y].n_par; k++){
+                            int py = cm[idx_x][idx_y].par_index[k];
+
+                            if (par[py].alive == 1){
+
+                                delta_x = par[py].x - par[px].x;
+                                delta_y = par[py].y - par[px].y;
+                                double distance2 = delta_x * delta_x + delta_y * delta_y;
+                                double distance = sqrt(distance2); 
+                                double distance3 = distance2 * distance;
+                                
+                                double force = G * (par[py].m * par[px].m) / distance3;
+
+                                double fx = force * delta_x;
+                                double fy = force * delta_y;
+
+                                par[px].Fx += fx;
+                                par[px].Fy += fy;
+
+                                par[py].Fx -= fx;
+                                par[py].Fy -= fy;
+        
+                            }
+                        }
                         
                         // Force component from the centers of mass
                         for(int w =-1; w<2; w++){
@@ -304,12 +299,12 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                                 double distance3_cm = distance2_cm * distance_cm;
 
                                 double force = G * (cm[cell_x][cell_y].M * par[px].m) / distance3_cm;  // G * M * m / r^3
-                                
+
                                 par[px].Fx += force * delta_x;
                                 par[px].Fy += force * delta_y;
                                 
                             } 
-                        }
+                        } 
 
                         par[px].ax = par[px].Fx/par[px].m; 
                         par[px].ay = par[px].Fy/par[px].m;
@@ -339,10 +334,11 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
 
         grid_calculation(cm,num_particles, cell_size, par, grid_size);
 
-
+        #pragma omp parallel 
+        #pragma omp for private(delta_x, delta_y) schedule(dynamic, 10) collapse(2) nowait
         for(int k=0; k<grid_size; k++){
             for(int w = 0; w<grid_size; w++){
-                    #pragma omp parallel for private(delta_x, delta_y) collapse(2)
+
                     for (int idx_a=0; idx_a < cm[k][w].n_par; idx_a++){
                         for (int idx_b=idx_a+1; idx_b < cm[k][w].n_par; idx_b++){
                             if ( par[cm[k][w].par_index[idx_a]].alive == 0 || par[cm[k][w].par_index[idx_b]].alive == 0)
@@ -367,11 +363,12 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
             }
         }    
 
-        #pragma omp parallel for 
+        #pragma omp parallel 
+        #pragma omp for schedule(dynamic, 10) nowait
         for(int n=0; n<collision_count; n++){
             par[colision[n].a].alive = 0;
             par[colision[n].b].alive = 0;
-            for(int m=n+1; m < collision_count; m++){
+            for(int m=n+1; m<collision_count; m++){
                 if(colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a){
                     #pragma omp atomic
                     collision_count--;
@@ -380,6 +377,8 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
         }
     }
     
+    #pragma omp parallel 
+    #pragma omp for schedule(dynamic, 10) nowait
     for(int i=0; i < grid_size; i++)
         free(cm[i]);
     free(cm);
@@ -418,7 +417,7 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     
     print_result(particles[0].x, particles[0].y, colisions);
-    //printf("Number threads: %d\n",num);
+    printf("Number threads: %d\n",num);
     fprintf(stderr, "%.1fs\n", exec_time);
     
     free(particles);
