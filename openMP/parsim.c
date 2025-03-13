@@ -217,7 +217,7 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
         #pragma omp for private(delta_x, delta_y) schedule(dynamic, 10) collapse(2) nowait
         for(int idx_x = 0; idx_x < grid_size; idx_x++){
             for(int idx_y = 0; idx_y < grid_size; idx_y++){  
-                num = omp_get_num_threads();              
+                //num = omp_get_num_threads();              
 
                 for(int j = 0; j<cm[idx_x][idx_y].n_par; j++){
 
@@ -417,7 +417,7 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     
     print_result(particles[0].x, particles[0].y, colisions);
-    printf("Number threads: %d\n",num);
+    //printf("Number threads: %d\n",num);
     fprintf(stderr, "%.1fs\n", exec_time);
     
     free(particles);
