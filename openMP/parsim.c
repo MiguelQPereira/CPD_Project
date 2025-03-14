@@ -10,8 +10,6 @@
 
 unsigned int seed;
 
-int num = 0;
-
 typedef struct particle_{
 
     double x; //x coordinate
@@ -31,8 +29,9 @@ typedef struct cm_{
         double X; //X center of mass
         double Y; //Y of center of mass
         double M; //sum of the mass of each particle
-        int * par_index;
-        int n_par;
+        int * par_index; //Index of particles in cell
+        int n_par; //Number of particles in cell
+        int cap;
 }center_mass;
 
 typedef struct {
@@ -92,7 +91,6 @@ void init_particles(long seed, double side, long ncside, long long n_part, parti
 void calc_center_mass(center_mass ** cm, long long num_particles, particle_t* par, double cell_size, long grid_size){
     int grid_x;
     int grid_y;
-    //omp_set_nested(1);
     
     // Set M of each cell to 0
     #pragma omp parallel
@@ -151,45 +149,71 @@ void calc_center_mass(center_mass ** cm, long long num_particles, particle_t* pa
 
 void grid_calculation(center_mass ** cm, long long num_particles, double cell_size, particle_t *par, long grid_size){
 
-    // Initialize par_index for each grid cell
-    //#pragma omp parallel
-    #pragma omp parallel
-    #pragma omp for schedule(dynamic, 10) collapse(2) nowait //nowait
-    for (int i = 0; i < grid_size; i++) {
-        for (int j = 0; j < grid_size; j++) {
-            cm[i][j].n_par = 0;
-        }
-    }
-
-    #pragma omp parallel 
-    #pragma omp for nowait
-    for (int p = 0; p < num_particles; p++) {
-        int n_local;
-        if (par[p].alive == 1){
-            double grid_x_aux = par[p].x / cell_size;
-            int grid_x = (int)grid_x_aux;
-
-            double grid_y_aux = par[p].y / cell_size;
-            int grid_y = (int)grid_y_aux;
-
-            #pragma omp atomic capture
-            {
-                n_local = cm[grid_x][grid_y].n_par;
-                cm[grid_x][grid_y].n_par++;
+        // Allocate and initialize locks for each grid cell
+        omp_lock_t **grid_locks = (omp_lock_t **)malloc(grid_size * sizeof(omp_lock_t *));
+        for (int i = 0; i < grid_size; i++) {
+            grid_locks[i] = (omp_lock_t *)malloc(grid_size * sizeof(omp_lock_t));
+            for (int j = 0; j < grid_size; j++) {
+                omp_init_lock(&grid_locks[i][j]);
             }
-            // Assign the particle index to the grid cell
-            cm[grid_x][grid_y].par_index[n_local] = p;
-            
-            
         }
-        
-    }
+    
+        // Initialize grid cells
+        #pragma omp parallel for collapse(2)
+        for (int i = 0; i < grid_size; i++) {
+            for (int j = 0; j < grid_size; j++) {
+                cm[i][j].n_par = 0;
+            }
+        }
+    
+        // Assign particles to grid cells
+        #pragma omp parallel for
+        for (int p = 0; p < num_particles; p++) {
+            if (par[p].alive) {
+                const int grid_x = (int)(par[p].x / cell_size);
+                const int grid_y = (int)(par[p].y / cell_size);
+    
+                // Handle periodic boundary conditions
+                const int wrapped_x = (grid_x + grid_size) % grid_size;
+                const int wrapped_y = (grid_y + grid_size) % grid_size;
+    
+                omp_set_lock(&grid_locks[wrapped_x][wrapped_y]);
+    
+                // Check if resize needed
+                if (cm[wrapped_x][wrapped_y].n_par >= cm[wrapped_x][wrapped_y].cap - 1) {
+                    const int new_cap = cm[wrapped_x][wrapped_y].cap * 2;
+                    int *temp = realloc(cm[wrapped_x][wrapped_y].par_index, new_cap * sizeof(int));
+                    if (!temp) {
+                        fprintf(stderr, "Realloc failed for grid cell [%d][%d]\n", wrapped_x, wrapped_y);
+                        omp_unset_lock(&grid_locks[wrapped_x][wrapped_y]);
+                        continue;
+                    }
+                    cm[wrapped_x][wrapped_y].par_index = temp;
+                    cm[wrapped_x][wrapped_y].cap = new_cap;
+                }
+    
+                // Store particle index
+                const int idx = cm[wrapped_x][wrapped_y].n_par++;
+                cm[wrapped_x][wrapped_y].par_index[idx] = p;
+                cm[wrapped_x][wrapped_y].par_index[idx + 1] = -1;
+    
+                omp_unset_lock(&grid_locks[wrapped_x][wrapped_y]);
+            }
+        }
+    
+        // Cleanup locks
+        for (int i = 0; i < grid_size; i++) {
+            for (int j = 0; j < grid_size; j++) {
+                omp_destroy_lock(&grid_locks[i][j]);
+            }
+            free(grid_locks[i]);
+        }
+        free(grid_locks);
     
 }
 
 int simulation(double space_size, long grid_size, long long num_particles, long long num_timesteps, particle_t *par){
     
-    //omp_set_nested(1);
     center_mass ** cm;
     double delta_x = 0, delta_y = 0; //displacement of the particle in x and y
     int collision_count = 0; //count collisions
@@ -201,8 +225,8 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
         for (int i=0; i < grid_size; i++){
             cm[i] = malloc(grid_size * sizeof(center_mass));
             for (int j= 0; j<grid_size; j++){
-                cm[i][j].par_index = malloc(num_particles * sizeof(int));
-                cm[i][j].par_index[0] = -1;
+                cm[i][j].par_index = malloc((int)(num_particles/(grid_size*grid_size)) * sizeof(int));
+                cm[i][j].cap = (int)(num_particles/(grid_size*grid_size)) ;
             }
         }
 
@@ -216,8 +240,7 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
         #pragma omp parallel 
         #pragma omp for private(delta_x, delta_y) schedule(dynamic, 10) collapse(2) nowait
         for(int idx_x = 0; idx_x < grid_size; idx_x++){
-            for(int idx_y = 0; idx_y < grid_size; idx_y++){  
-                num = omp_get_num_threads();              
+            for(int idx_y = 0; idx_y < grid_size; idx_y++){               
 
                 for(int j = 0; j<cm[idx_x][idx_y].n_par; j++){
 
@@ -352,7 +375,6 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
                                 if (collision_count < num_particles) {
                                     colision[collision_count].a = cm[k][w].par_index[idx_a];
                                     colision[collision_count].b = cm[k][w].par_index[idx_b];
-                                    //printf("t = %d Colision: %d %d\n", i, cm[k][w].par_index[idx_a],cm[k][w].par_index[idx_b]);
                                     #pragma omp atomic
                                     collision_count++;
                                 }
@@ -379,8 +401,12 @@ int simulation(double space_size, long grid_size, long long num_particles, long 
     
     #pragma omp parallel 
     #pragma omp for schedule(dynamic, 10) nowait
-    for(int i=0; i < grid_size; i++)
+    for(int i=0; i < grid_size; i++) {
         free(cm[i]);
+        for(int j = 0; j < grid_size; j++) {
+            free(cm[i][j].par_index);
+        }
+    }
     free(cm);
 
     return collision_count;
@@ -417,7 +443,6 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     
     print_result(particles[0].x, particles[0].y, colisions);
-    printf("Number threads: %d\n",num);
     fprintf(stderr, "%.1fs\n", exec_time);
     
     free(particles);
