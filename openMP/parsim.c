@@ -91,6 +91,16 @@ void init_particles(long seed, double side, long ncside, long long n_part, parti
 void calc_center_mass(center_mass ** cm, long long num_particles, particle_t* par, double cell_size, long grid_size){
     int grid_x;
     int grid_y;
+
+    // Allocate and initialize locks for each center of mass
+    omp_lock_t **center_locks = (omp_lock_t **)malloc(grid_size * sizeof(omp_lock_t *));
+    for (int i = 0; i < grid_size; i++) {
+        center_locks[i] = (omp_lock_t *)malloc(grid_size * sizeof(omp_lock_t));
+        for (int j = 0; j < grid_size; j++) {
+            omp_init_lock(&center_locks[i][j]);
+        }
+    }
+
     
     // Set M of each cell to 0
     #pragma omp parallel
@@ -120,12 +130,15 @@ void calc_center_mass(center_mass ** cm, long long num_particles, particle_t* pa
             double grid_y_aux = par[i].y / cell_size;
             grid_y = (int) grid_y_aux;
 
-            #pragma omp critical
-            {
-                cm[grid_x][grid_y].M += par[i].m;
-                cm[grid_x][grid_y].X += (par[i].m * par[i].x);
-                cm[grid_x][grid_y].Y += (par[i].m * par[i].y);
-            }
+            // Handle periodic boundary conditions
+            const int wrapped_x = (grid_x + grid_size) % grid_size;
+            const int wrapped_y = (grid_y + grid_size) % grid_size;
+
+            omp_set_lock(&center_locks[wrapped_x][wrapped_y]);
+            cm[grid_x][grid_y].M += par[i].m;
+            cm[grid_x][grid_y].X += (par[i].m * par[i].x);
+            cm[grid_x][grid_y].Y += (par[i].m * par[i].y);
+            omp_unset_lock(&center_locks[wrapped_x][wrapped_y]);
             
         }
 
