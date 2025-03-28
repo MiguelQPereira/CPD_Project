@@ -195,6 +195,20 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     double cell_size = (double)space_size / grid_size;
     double x;
     double y;
+    int n_prev = 0, n_next = 0;
+    parcell* to_send_prev;
+    parcell* to_send_next;
+
+    to_send_next = malloc(work_size * sizeof(particle_t));
+    to_send_prev = malloc(work_size * sizeof(particle_t));
+
+    for(int i=0; i<work_size; i++){
+        to_send_next[i].par = malloc(sizeof(particle_t));
+        to_send_next[i].size = 1;
+        to_send_prev[i].par = malloc(sizeof(particle_t));
+        to_send_prev[i].size = 1;
+    }
+
     for(int cell = start_point; cell < (start_point+work_size); cell++){
         for (int id_par=0; id_par < st_par[cell].n_particles; id_par++){
 
@@ -231,14 +245,18 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int new_cell = grid_x * grid_size + grid_y;
         
             if (new_cell != cell){
-                if(new_cell > (work_size*rank) && new_cell<((work_size*rank) + work_size)){
+                if (new_cell < start_point){
+                    to_send_prev[cell-start_point].n_particles ++;
+                    to_send_prev[cell-start_point].
+
+                }
+                else if (new_cell > start_point + work_size){
+                    n_next++;
+
+
+                }else{
                     st_par[new_cell].par[st_par[new_cell].n_particles] = st_par[cell].par[id_par];
                     st_par[new_cell].n_particles++;
-                }
-        
-                else{
-                    // Usar o MPI send !!!
-        
                 }
         
                 if (id_par != st_par[cell].n_particles-1){
@@ -248,6 +266,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
         }
     }
+
+    // Usar o MPI send !!!
     
 }
 
