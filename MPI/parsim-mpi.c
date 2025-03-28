@@ -190,58 +190,65 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     
 }
 
-void cell_calculation(int cell, parcell* st_par, int id_par, long grid_size, double space_size){
+void cell_calculation(parcell* st_par, long grid_size, double space_size){
     
     double cell_size = (double)space_size / grid_size;
-    double x = st_par[cell].par[id_par].x;
-    double y = st_par[cell].par[id_par].y;
+    double x;
+    double y;
+    for(int cell = start_point; cell < (start_point+work_size); cell++){
+        for (int id_par=0; id_par < st_par[cell].n_particles; id_par++){
 
-    if(x<0){
-        x = space_size;
-        st_par[cell].par[id_par].x += space_size;
-    }
+            x = st_par[cell].par[id_par].x;
+            y = st_par[cell].par[id_par].y;
+
+            if(x<0){
+                x = space_size;
+                st_par[cell].par[id_par].x += space_size;
+            }
+                
         
-
-    if(y<0){
-        y += space_size;
-        st_par[cell].par[id_par].y += space_size;
-    }
-
-    if(x > space_size){
-        x -= space_size;
-        st_par[cell].par[id_par].x -= space_size;
+            if(y<0){
+                y += space_size;
+                st_par[cell].par[id_par].y += space_size;
+            }
+        
+            if(x > space_size){
+                x -= space_size;
+                st_par[cell].par[id_par].x -= space_size;
+            }
+            
+            if(y > space_size){
+                y -= space_size;
+                st_par[cell].par[id_par].y -= space_size;
+            }
+        
+            double grid_x_aux = x / cell_size;
+            int grid_x = (int)grid_x_aux;
+        
+            double grid_y_aux = y / cell_size;
+            int grid_y = (int)grid_y_aux;
+        
+            int new_cell = grid_x * grid_size + grid_y;
+        
+            if (new_cell != cell){
+                if(new_cell > (work_size*rank) && new_cell<((work_size*rank) + work_size)){
+                    st_par[new_cell].par[st_par[new_cell].n_particles] = st_par[cell].par[id_par];
+                    st_par[new_cell].n_particles++;
+                }
+        
+                else{
+                    // Usar o MPI send !!!
+        
+                }
+        
+                if (id_par != st_par[cell].n_particles-1){
+                    st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1];
+                }
+                st_par[cell].n_particles--;
+            }
+        }
     }
     
-    if(y > space_size){
-        y -= space_size;
-        st_par[cell].par[id_par].y -= space_size;
-    }
-
-    double grid_x_aux = x / cell_size;
-    int grid_x = (int)grid_x_aux;
-
-    double grid_y_aux = y / cell_size;
-    int grid_y = (int)grid_y_aux;
-
-    int new_cell = grid_x * grid_size + grid_y;
-
-    if (new_cell != cell){
-        if(new_cell > (work_size*rank) && new_cell<((work_size*rank) + work_size)){
-            st_par[new_cell].par[st_par[new_cell].n_particles] = st_par[cell].par[id_par];
-            st_par[new_cell].n_particles++;
-        }
-
-        else{
-            // Usar o MPI send !!!
-
-        }
-
-        if (id_par != st_par[cell].n_particles-1){
-            st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1];
-        }
-        st_par[cell].n_particles--;
-    }
-
 }
 
 
@@ -357,11 +364,12 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     px->vx = px->vx + px->ax*DELTAT; //calculate new velocity along x
                     px->vy = px->vy + px->ay*DELTAT; //calculate new velocity along y  
 
-                    cell_calculation(j, st_par, k, grid_size, space_size);
                 }
             }
         
         }
+
+        cell_calculation(st_par, grid_size, space_size);
 
         for(int j=start_point; j<start_point + work_size ;j++){
 
