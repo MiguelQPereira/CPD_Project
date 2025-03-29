@@ -201,7 +201,7 @@ void create_mpi_particle_t(){
 void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, double cell_size, long grid_size){
     int grid_x;
     int grid_y;
-    printf("Antes Calculo centro de massa, Rank %d:", rank);
+    printf("Antes Calculo centro de massa, Rank %d:\n", rank);
 
     for(int i=start_point; i<start_point + work_size ;i++){
         cm[i].M = 0;
@@ -232,7 +232,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     }
     center_mass* send = cm + (work_size * sizeof(center_mass) * rank);
-    printf("Antes Broadcast, Rank %d:", rank);
+    printf("Antes Broadcast, Rank %d:\n", rank);
 
     MPI_Bcast(send, work_size, MPI_CENTER_MASS, rank, MPI_COMM_WORLD);
     
@@ -543,7 +543,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         
         }
 
-        printf("Antes Cell_calculation , Rank %d:", rank);
+        printf("Antes Cell_calculation , Rank %d:\n", rank);
         cell_calculation(st_par, grid_size, space_size);
 
         for(int j=start_point; j<start_point + work_size ;j++){
@@ -629,7 +629,7 @@ int main(int argc, char *argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &psize); 
     
-    printf("Antes Create INIt, Rank %d:", rank);
+    printf("Antes Create INIt, Rank %d:\n", rank);
     create_mpi_center_mass_type();
     create_mpi_particle_t();
     
@@ -651,7 +651,7 @@ int main(int argc, char *argv[]){
 
     center_mass* cells = malloc((grid_size*grid_size) * sizeof(center_mass)); 
     
-    printf("Antes Init, Rank %d:", rank);
+    printf("Antes Init, Rank %d:\n", rank);
     init_particles(sseed, space_size, grid_size, num_particles, particles);
 
     exec_time = -omp_get_wtime();
