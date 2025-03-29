@@ -210,14 +210,14 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
         cm[i].X = 0;
         cm[i].Y = 0;
 
-        for(int j = 0; j< par[i].n_particles; j++){
+        for(int j = 0; j< par[i-start_point].n_particles; j++){
             par[i-start_point].par[j].Fx = 0;
             par[i-start_point].par[j].Fy = 0;
 
             if ( par[i-start_point].par[j].alive == 0)
                 continue;
 
-            cm[j].M +=  par[i].par[j].m;
+            cm[j].M +=  par[i-start_point].par[j].m;
             cm[j].X += ( par[i-start_point].par[j].m *  par[i-start_point].par[j].x);
             cm[j].Y += ( par[i-start_point].par[j].m *  par[i-start_point].par[j].y);
         
