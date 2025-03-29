@@ -119,7 +119,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
         int id_aux = grid_x * ncside + grid_y;
         
-        if (id_aux > start_point && id_aux < start_point+work_size){
+        if (id_aux >= start_point && id_aux < start_point+work_size){
             par[id_aux].par[par[id_aux].n_particles].id = i;
             par[id_aux].par[par[id_aux].n_particles].x = aux.x; 
             par[id_aux].par[par[id_aux].n_particles].y = aux.y; 
@@ -131,7 +131,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
             par[id_aux].n_particles++;
 
             if (par[id_aux].n_particles == par[id_aux].size){
-                realloc(par[id_aux].par, par[id_aux].size * 2);
+                realloc(par[id_aux].par, par[id_aux].size * 2 * sizeof(particle_t));
                 par[id_aux].size *= 2;
             }
         }
@@ -283,7 +283,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     to_send_prev.n_particles ++;
 
                     if(to_send_prev.n_particles == to_send_prev.size){
-                        realloc(to_send_prev.par, to_send_prev.size * 2);
+                        realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
                         to_send_prev.size *= 2;
                     }
 
@@ -293,7 +293,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     to_send_next.n_particles ++;
 
                     if(to_send_next.n_particles == to_send_next.size){
-                        realloc(to_send_next.par, to_send_next.size * 2);
+                        realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
                         to_send_next.size *= 2;
                     }
 
@@ -302,7 +302,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     st_par[new_cell].n_particles++;
 
                     if(st_par[new_cell].n_particles == st_par[new_cell].size){
-                        realloc(st_par[new_cell].par, st_par[new_cell].size * 2);
+                        realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
                         st_par[new_cell].size *= 2;
                     }
                 }
@@ -379,7 +379,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             st_par[new_cell].n_particles++;
             
             if(st_par[new_cell].n_particles == st_par[new_cell].size){
-                realloc(st_par[new_cell].par, st_par[new_cell].size * 2);
+                realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
                 st_par[new_cell].size *= 2;
             }
         }
@@ -402,7 +402,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             st_par[new_cell].n_particles++;
 
             if(st_par[new_cell].n_particles == st_par[new_cell].size){
-                realloc(st_par[new_cell].par, st_par[new_cell].size * 2);
+                realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
                 st_par[new_cell].size *= 2;
             }
         }
@@ -589,7 +589,7 @@ void print_result(parcell* st_par, int local_collisions){
     MPI_Reduce(&local_collisions, &total_collisions, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     if (rank == 0){
-        fprintf(stdout, "%d\n", &total_collisions);
+        fprintf(stdout, "%d\n", total_collisions);
     }
 }
 
@@ -616,7 +616,7 @@ int main(int argc, char *argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &psize); 
     
-    start_point = rank*work_size;
+    
     create_mpi_center_mass_type();
     create_mpi_particle_t();
     
@@ -628,6 +628,8 @@ int main(int argc, char *argv[]){
         work_size ++;
     }
 
+    start_point = rank*work_size;
+    
     particles = malloc(work_size * sizeof(parcell));
 
     center_mass* cells = malloc((grid_size*grid_size) * sizeof(center_mass)); 
