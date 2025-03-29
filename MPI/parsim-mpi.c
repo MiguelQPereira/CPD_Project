@@ -428,13 +428,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
 
 int simulation(center_mass *cells, double space_size, long grid_size, long long num_particles, long long num_timesteps, parcell *st_par){
-
+    printf("Entrou simulation , Rank %d:\n", rank);
     double delta_x = 0, delta_y = 0; //displacement of the particle in x and y
     int collision_count = 0; //count collisions
     double cell_size = (double)space_size / grid_size;
     ParColision colision[num_particles];
     particle_t *px,*py;
 
+    printf("Entrou simulation 2 , Rank %d:\n", rank);
     for(int t = 0; t < num_timesteps; t++){
         calc_center_mass(cells, num_particles, st_par, space_size, grid_size);
         
@@ -629,7 +630,6 @@ int main(int argc, char *argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &psize); 
     
-    printf("Antes Create INIt, Rank %d:\n", rank);
     create_mpi_center_mass_type();
     create_mpi_particle_t();
     
@@ -651,11 +651,10 @@ int main(int argc, char *argv[]){
 
     center_mass* cells = malloc((grid_size*grid_size) * sizeof(center_mass)); 
     
-    printf("Antes Init, Rank %d:\n", rank);
     init_particles(sseed, space_size, grid_size, num_particles, particles);
-    printf("Depois Init, Rank %d:\n", rank);
+    printf("Depois Init, Rank :%d\n", rank);
     exec_time = -omp_get_wtime();
-    
+    printf("Depois OMP, Rank :%d\n", rank);
 
     int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
 
