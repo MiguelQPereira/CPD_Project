@@ -84,6 +84,7 @@ double rnd_normal01()
 void init_particles(long seed, double side, long ncside, long long n_part, parcell *par)
 {   
     double (*rnd01)() = rnd_uniform01;
+    long long i;
     particle_t aux;
 
     if(seed < 0) {
@@ -91,57 +92,61 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
         seed = -seed;
     }
 
-    // Initialize particle arrays for LOCAL cells
-    for(int i = 0; i < work_size; i++) {
+    for(int i=0; i < work_size; i++){
         par[i].n_particles = 0;
-        // Start with at least 10 particles per cell to minimize reallocations
-        par[i].size = fmax(n_part/(ncside*ncside), 10);
+        par[i].size = n_part/(ncside*ncside);
         par[i].par = malloc(par[i].size * sizeof(particle_t));
-        if(!par[i].par) {
+        if(par[i].par == NULL) {
             fprintf(stderr, "Memory allocation failed\n");
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
     }
 
+    
+    printf("Antes Init, Rank %d:\n", rank);
     init_r4uni(seed);
 
-    for(long long i = 0; i < n_part; i++) {
-        // Generate particle properties
+    for(i = 0; i < n_part; i++) {
+
         aux.x = rnd01() * side;
         aux.y = rnd01() * side;
         aux.vx = (rnd01() - 0.5) * side / ncside / 5.0;
         aux.vy = (rnd01() - 0.5) * side / ncside / 5.0;
+
         aux.m = rnd01() * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
-        aux.alive = 1;
 
-        // Calculate grid position
-        int grid_x = (int)(aux.x / side);
-        int grid_y = (int)(aux.y / side);
-        int global_cell = grid_x * ncside + grid_y;
+        double grid_x_aux =  aux.x / side;
+        int grid_x = (int)grid_x_aux;
 
-        // Check if particle belongs to this MPI process
-        if (global_cell >= start_point && global_cell < start_point + work_size) {
-            // Convert global cell index to local array index
-            int local_cell = global_cell - start_point;
-            
-            // Check array bounds and realloc if needed
-            if(par[local_cell].n_particles >= par[local_cell].size) {
-                size_t new_size = par[local_cell].size * 2;
-                particle_t *new_par = realloc(par[local_cell].par, new_size * sizeof(particle_t));
-                if(!new_par) {
+        double grid_y_aux = aux.y / side;
+        int grid_y = (int)grid_y_aux;
+
+        int id_aux = grid_x * ncside + grid_y;
+        
+        if (id_aux >= start_point && id_aux < start_point+work_size){
+            par[id_aux].par[par[id_aux].n_particles].id = i;
+            par[id_aux].par[par[id_aux].n_particles].x = aux.x; 
+            par[id_aux].par[par[id_aux].n_particles].y = aux.y; 
+            par[id_aux].par[par[id_aux].n_particles].vx = aux.vx; 
+            par[id_aux].par[par[id_aux].n_particles].vy = aux.vy;
+            par[id_aux].par[par[id_aux].n_particles].m = aux.m;
+            par[id_aux].par[par[id_aux].n_particles].alive = 1;
+
+            par[id_aux].n_particles++;
+
+            if (par[id_aux].n_particles == par[id_aux].size){
+                par[id_aux].par = realloc(par[id_aux].par, par[id_aux].size * 2 * sizeof(particle_t));
+                par[id_aux].size *= 2;
+
+                if(par[id_aux].par == NULL){
                     fprintf(stderr, "Memory reallocation failed\n");
                     MPI_Abort(MPI_COMM_WORLD, 1);
                 }
-                par[local_cell].par = new_par;
-                par[local_cell].size = new_size;
             }
-
-            // Store particle in local array
-            par[local_cell].par[par[local_cell].n_particles] = aux;
-            par[local_cell].par[par[local_cell].n_particles].id = i;
-            par[local_cell].n_particles++;
         }
     }
+
+    
 }
 
 
