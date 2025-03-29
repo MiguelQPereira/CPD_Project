@@ -431,7 +431,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     printf("Entrou simulation , Rank %d:\n", rank);
     double delta_x = 0, delta_y = 0; //displacement of the particle in x and y
     int collision_count = 0; //count collisions
-    double cell_size = (double)space_size / grid_size;
+    //double cell_size = (double)space_size / grid_size;
     ParColision colision[num_particles];
     particle_t *px,*py;
 
