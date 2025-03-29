@@ -18,14 +18,6 @@ int start_point;
 MPI_Datatype MPI_CENTER_MASS;
 MPI_Datatype MPI_PARTICLE_T;
 
-typedef struct parcell_t{
-
-    int n_particles;
-    particle_t *par;
-    int size;
-
-}parcell;
-
 typedef struct particle_{
     long long id; // particle id
     double x; //x coordinate
@@ -40,6 +32,14 @@ typedef struct particle_{
     int alive; //1 if alive, 0 if evaporated/collided
     
 }particle_t;
+
+typedef struct parcell_t{
+
+    int n_particles;
+    particle_t *par;
+    int size;
+
+}parcell;
 
 typedef struct cm_{
     double X; //X center of mass
@@ -221,7 +221,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
         cm[i].Y /= cm[i].M;
 
     }
-    center_mass* send = &cm + (work_size * sizeof(center_mass) * rank);
+    center_mass* send = cm + (work_size * sizeof(center_mass) * rank);
     MPI_Bcast(send, work_size, MPI_CENTER_MASS, rank, MPI_COMM_WORLD);
     
 }
@@ -421,8 +421,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     int collision_count = 0; //count collisions
     double cell_size = (double)space_size / grid_size;
     ParColision colision[num_particles];
-
-
+    particle_t *px,*py;
 
     for(int t = 0; t < num_timesteps; t++){
         calc_center_mass(cells, num_particles, st_par, space_size, grid_size);
@@ -432,13 +431,13 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
             for(int k = 0; k<st_par[j].n_particles; k++){  
 
-                particle_t *px = &st_par[j].par[k];
+                px = st_par[j].par[k];
 
                 if(px->alive == 1){
 
                     for(int l=k+1; l<st_par[j].n_particles; l++){
 
-                        particle_t *py = &st_par[j].par[l];
+                        py = st_par[j].par[l];
 
                         if (py->alive == 1){
 
