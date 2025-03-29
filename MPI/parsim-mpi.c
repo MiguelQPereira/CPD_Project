@@ -202,23 +202,24 @@ void create_mpi_particle_t(){
 void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, double cell_size, long grid_size){
     int grid_x;
     int grid_y;
-    printf("Antes Calculo centro de massa, Rank %d:\n", rank);
+    printf("Antes Calculo centro de massa, Rank: %d\n", rank);
 
     for(int i=start_point; i<start_point + work_size ;i++){
+        
         cm[i].M = 0;
         cm[i].X = 0;
         cm[i].Y = 0;
 
         for(int j = 0; j< par[i].n_particles; j++){
-            par[i].par[j].Fx = 0;
-            par[i].par[j].Fy = 0;
+            par[i-start_point].par[j].Fx = 0;
+            par[i-start_point].par[j].Fy = 0;
 
-            if ( par[i].par[j].alive == 0)
+            if ( par[i-start_point].par[j].alive == 0)
                 continue;
 
             cm[j].M +=  par[i].par[j].m;
-            cm[j].X += ( par[i].par[j].m *  par[i].par[j].x);
-            cm[j].Y += ( par[i].par[j].m *  par[i].par[j].y);
+            cm[j].X += ( par[i-start_point].par[j].m *  par[i-start_point].par[j].x);
+            cm[j].Y += ( par[i-start_point].par[j].m *  par[i-start_point].par[j].y);
         
         }
 
@@ -232,6 +233,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
         cm[i].Y /= cm[i].M;
 
     }
+    printf("Final Calculo centro de massa, Rank: %d\n", rank);
     center_mass* send = cm + (work_size * sizeof(center_mass) * rank);
     printf("Antes Broadcast, Rank %d:\n", rank);
 
@@ -660,7 +662,6 @@ int main(int argc, char *argv[]){
     init_particles(sseed, space_size, grid_size, num_particles, particles);
     printf("Depois Init, Rank :%d\n", rank);
     exec_time = -omp_get_wtime();
-    printf("Depois OMP, Rank :%d\n", rank);
 
     int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
 
