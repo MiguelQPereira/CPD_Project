@@ -489,8 +489,8 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                             if(y==0 && w== 0){  // Skip the cell of the particle
                                 continue;
                             }
-                            int cell_x = j / grid_size;
-                            int cell_y = j % grid_size;
+                            int cell_x = (j + start_point) / grid_size;
+                            int cell_y = (j + start_point) % grid_size;
 
                             int cellad_x = cell_x + w;
                             int cellad_y = cell_y + y;
