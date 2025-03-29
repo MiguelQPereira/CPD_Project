@@ -431,13 +431,13 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
             for(int k = 0; k<st_par[j].n_particles; k++){  
 
-                px = st_par[j].par[k];
+                px = &st_par[j].par[k];
 
                 if(px->alive == 1){
 
                     for(int l=k+1; l<st_par[j].n_particles; l++){
 
-                        py = st_par[j].par[l];
+                        py = &st_par[j].par[l];
 
                         if (py->alive == 1){
 
@@ -580,7 +580,7 @@ void print_result(parcell* st_par, int local_collisions){
     int total_collisions;
 
     for (int i=0; i<work_size; i++){
-        for(int j=0; j<st_par[i].n_particles, j++){
+        for(int j=0; j<st_par[i].n_particles; j++){
             if (st_par[i].par[j].id == 0)
                 fprintf(stdout, "%.3f %.3f\n", st_par[i].par[j].x, st_par[i].par[j].y);
         }
