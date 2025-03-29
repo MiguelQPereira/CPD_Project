@@ -96,6 +96,10 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
         par[i].n_particles = 0;
         par[i].size = n_part/(ncside*ncside);
         par[i].par = malloc(par[i].size * sizeof(particle_t));
+        if(par[i].par == NULL) {
+            fprintf(stderr, "Memory allocation failed\n");
+            MPI_Abort(MPI_COMM_WORLD, 1);
+        }
     }
 
     
@@ -131,7 +135,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
             par[id_aux].n_particles++;
 
             if (par[id_aux].n_particles == par[id_aux].size){
-                realloc(par[id_aux].par, par[id_aux].size * 2 * sizeof(particle_t));
+                realloc(par[id_aux].n_particles, par[id_aux].size * 2 * sizeof(particle_t));
                 par[id_aux].size *= 2;
             }
         }
