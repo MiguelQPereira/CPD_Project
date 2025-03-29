@@ -330,6 +330,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         }
     }
 
+    printf("Inicio Comunicaçao , Rank %d:\n", rank);
     int prev_rank = (rank - 1 + psize) % psize;
     int next_rank = (rank + 1) % psize;
 
@@ -554,6 +555,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
         printf("Antes Cell_calculation , Rank %d:\n", rank);
         cell_calculation(st_par, grid_size, space_size);
+        printf("Saiu Cell_calculation , Rank %d:\n", rank);
 
         for(int j=start_point; j<start_point + work_size ;j++){
 
@@ -579,7 +581,8 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                 } 
             }                
         }
-           
+        
+        printf("Antes Check colssions , Rank %d:\n", rank);
     
         for(int n=0; n<collision_count; n++){
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
