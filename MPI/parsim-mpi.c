@@ -124,21 +124,22 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
         int id_aux = grid_x * ncside + grid_y;
         
         if (id_aux >= start_point && id_aux < start_point+work_size){
-            par[id_aux].par[par[id_aux].n_particles].id = i;
-            par[id_aux].par[par[id_aux].n_particles].x = aux.x; 
-            par[id_aux].par[par[id_aux].n_particles].y = aux.y; 
-            par[id_aux].par[par[id_aux].n_particles].vx = aux.vx; 
-            par[id_aux].par[par[id_aux].n_particles].vy = aux.vy;
-            par[id_aux].par[par[id_aux].n_particles].m = aux.m;
-            par[id_aux].par[par[id_aux].n_particles].alive = 1;
+            int local_cell = id_aux - start_point;
+            par[local_cell].par[par[local_cell].n_particles].id = i;
+            par[local_cell].par[par[local_cell].n_particles].x = aux.x; 
+            par[local_cell].par[par[local_cell].n_particles].y = aux.y; 
+            par[local_cell].par[par[local_cell].n_particles].vx = aux.vx; 
+            par[local_cell].par[par[local_cell].n_particles].vy = aux.vy;
+            par[local_cell].par[par[local_cell].n_particles].m = aux.m;
+            par[local_cell].par[par[local_cell].n_particles].alive = 1;
 
-            par[id_aux].n_particles++;
+            par[local_cell].n_particles++;
 
-            if (par[id_aux].n_particles == par[id_aux].size){
-                par[id_aux].par = realloc(par[id_aux].par, par[id_aux].size * 2 * sizeof(particle_t));
-                par[id_aux].size *= 2;
+            if (par[local_cell].n_particles == par[local_cell].size){
+                par[local_cell].par = realloc(par[local_cell].par, par[local_cell].size * 2 * sizeof(particle_t));
+                par[local_cell].size *= 2;
 
-                if(par[id_aux].par == NULL){
+                if(par[local_cell].par == NULL){
                     fprintf(stderr, "Memory reallocation failed\n");
                     MPI_Abort(MPI_COMM_WORLD, 1);
                 }
@@ -432,7 +433,12 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     double delta_x = 0, delta_y = 0; //displacement of the particle in x and y
     int collision_count = 0; //count collisions
     //double cell_size = (double)space_size / grid_size;
-    ParColision colision[num_particles];
+    ParColision *colision = malloc(num_particles * sizeof(ParColision));
+    if(colision == NULL) {
+        fprintf(stderr, "Falha na alocação de memória para colisões\n");
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
+    //ParColision colision[num_particles];
     particle_t *px,*py;
 
     printf("Entrou simulation 2 , Rank %d:\n", rank);
