@@ -586,6 +586,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         printf("Antes Check colssions , Rank %d:\n", rank);
     
         for(int n=0; n<collision_count; n++){
+            printf("ALERTA COLISAO , Rank %d:\n", rank);
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
             st_par[colision[n].cell].par[colision[n].b].alive = 0;
             for(int m=n+1; m<collision_count; m++){
@@ -596,6 +597,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         }
     }
     
+    printf("RETURN , Rank %d:\n", rank);
     return collision_count;
     
     
