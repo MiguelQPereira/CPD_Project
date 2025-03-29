@@ -291,9 +291,10 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int grid_y = (int)grid_y_aux;
         
             int new_cell = grid_x * grid_size + grid_y;
-        
+            
+            
             if (new_cell != cell){
-                if (new_cell < start_point){
+                if (new_cell < 0){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
 
@@ -303,7 +304,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     }
 
                 }
-                else if (new_cell > start_point + work_size){
+                else if (new_cell > work_size){
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
 
