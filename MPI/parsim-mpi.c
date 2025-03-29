@@ -15,6 +15,7 @@ int psize;
 int start_point;
 
 MPI_Datatype MPI_CENTER_MASS;
+MPI_Datatype MPI_PARTICLE_T;
 
 typedef struct parcell_t{
 
@@ -140,9 +141,9 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
 
 void create_mpi_center_mass_type() {
-    int block_lengths[3] = {1, 1, 1};  // Número de elementos em cada bloco
+    int block_lengths[3] = {1, 1, 1}; 
     MPI_Aint offsets[3];
-    MPI_Datatype types[3] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, }; // Tipos de dados
+    MPI_Datatype types[3] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, }; 
 
     offsets[0] = offsetof(center_mass, X);
     offsets[1] = offsetof(center_mass, Y);
@@ -150,6 +151,40 @@ void create_mpi_center_mass_type() {
 
     MPI_Type_create_struct(3, block_lengths, offsets, types, &MPI_CENTER_MASS);
     MPI_Type_commit(&MPI_CENTER_MASS);
+}
+
+
+void create_mpi_particle_t(){
+    MPI_Aint displacements[11];
+    int blocklengths[11] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    MPI_Datatype types[11] = {
+        MPI_LONG_LONG,  // id
+        MPI_DOUBLE,     // x
+        MPI_DOUBLE,     // y
+        MPI_DOUBLE,     // vx
+        MPI_DOUBLE,     // vy
+        MPI_DOUBLE,     // Fx
+        MPI_DOUBLE,     // Fy
+        MPI_DOUBLE,     // ax
+        MPI_DOUBLE,     // ay
+        MPI_DOUBLE,     // m
+        MPI_INT         // alive
+    };
+
+    displacements[0] = offsetof(particle_t, id);
+    displacements[1] = offsetof(particle_t, x);
+    displacements[2] = offsetof(particle_t, y);
+    displacements[3] = offsetof(particle_t, vx);
+    displacements[4] = offsetof(particle_t, vy);
+    displacements[5] = offsetof(particle_t, Fx);
+    displacements[6] = offsetof(particle_t, Fy);
+    displacements[7] = offsetof(particle_t, ax);
+    displacements[8] = offsetof(particle_t, ay);
+    displacements[9] = offsetof(particle_t, m);
+    displacements[10] = offsetof(particle_t, alive);
+
+    MPI_Type_create_struct(11, blocklengths, displacements, types, &MPI_PARTICLE_T);
+    MPI_Type_commit(&MPI_PARTICLE_T);
 }
 
 
@@ -196,18 +231,15 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     double x;
     double y;
     int n_prev = 0, n_next = 0;
-    parcell* to_send_prev;
-    parcell* to_send_next;
+    parcell to_send_prev;
+    parcell to_send_next;
 
-    to_send_next = malloc(work_size * sizeof(particle_t));
-    to_send_prev = malloc(work_size * sizeof(particle_t));
-
-    for(int i=0; i<work_size; i++){
-        to_send_next[i].par = malloc(sizeof(particle_t));
-        to_send_next[i].size = 1;
-        to_send_prev[i].par = malloc(sizeof(particle_t));
-        to_send_prev[i].size = 1;
-    }
+    to_send_next.par = malloc(work_size * sizeof(particle_t));
+    to_send_next.size = work_size;
+    to_send_next.n_particles = 0;
+    to_send_prev.par = malloc(work_size * sizeof(particle_t));
+    to_send_prev.size = work_size;
+    to_send_prev.n_particles = 0;
 
     for(int cell = start_point; cell < (start_point+work_size); cell++){
         for (int id_par=0; id_par < st_par[cell].n_particles; id_par++){
@@ -246,29 +278,139 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
             if (new_cell != cell){
                 if (new_cell < start_point){
-                    to_send_prev[cell-start_point].n_particles ++;
-                    to_send_prev[cell-start_point].
+                    to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
+                    to_send_prev.n_particles ++;
+
+                    if(to_send_prev.n_particles == to_send_prev.size){
+                        realloc(to_send_prev.par, to_send_prev.size * 2);
+                        to_send_prev.size *= 2;
+                    }
 
                 }
                 else if (new_cell > start_point + work_size){
-                    n_next++;
+                    to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
+                    to_send_next.n_particles ++;
 
+                    if(to_send_next.n_particles == to_send_next.size){
+                        realloc(to_send_next.par, to_send_next.size * 2);
+                        to_send_next.size *= 2;
+                    }
 
                 }else{
                     st_par[new_cell].par[st_par[new_cell].n_particles] = st_par[cell].par[id_par];
                     st_par[new_cell].n_particles++;
+
+                    if(st_par[new_cell].n_particles == st_par[new_cell].size){
+                        realloc(st_par[new_cell].par, st_par[new_cell].size * 2);
+                        st_par[new_cell].size *= 2;
+                    }
                 }
         
                 if (id_par != st_par[cell].n_particles-1){
-                    st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1];
+                    st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1]; 
                 }
                 st_par[cell].n_particles--;
             }
         }
     }
 
-    // Usar o MPI send !!!
+    int prev_rank = (rank - 1 + psize) % psize;
+    int next_rank = (rank + 1) % psize;
+
+    particle_t *rcv_prev_par = NULL;
+    particle_t *rcv_next_par = NULL;
+
+    MPI_Request send_requests[2], recv_requests[2];
+    MPI_Status statuses[2];
+
+    int incoming_prev_count = 0, incoming_next_count = 0;
+
+    MPI_Irecv(&incoming_prev_count, 1, MPI_INT, prev_rank, 1, MPI_COMM_WORLD, &recv_requests[0]);
+    MPI_Irecv(&incoming_next_count, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &recv_requests[1]);
+
+    int prev_count = to_send_prev.n_particles;
+    int next_count = to_send_next.n_particles;
     
+    
+    MPI_Isend(&prev_count, 1, MPI_INT, prev_rank, 0, MPI_COMM_WORLD, &send_requests[0]);
+    MPI_Isend(&next_count, 1, MPI_INT, next_rank, 1, MPI_COMM_WORLD, &send_requests[1]);
+
+    MPI_Waitall(2, recv_requests, statuses);
+    MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
+
+    // Allocate receive buffers
+    if (incoming_prev_count > 0) {
+        rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
+        MPI_Irecv(rcv_prev_par, incoming_prev_count * sizeof(particle_t), MPI_PARTICLE_T, prev_rank, 3, MPI_COMM_WORLD, &recv_requests[0]);        
+    }
+    if (incoming_next_count > 0) {
+        rcv_next_par = malloc(incoming_next_count * sizeof(particle_t));
+        MPI_Irecv(rcv_next_par, incoming_next_count * sizeof(particle_t), MPI_PARTICLE_T,next_rank, 2, MPI_COMM_WORLD, &recv_requests[1]);
+    }
+    
+    if (prev_count > 0) {
+        MPI_Isend(to_send_prev.par, prev_count *sizeof(particle_t), MPI_PARTICLE_T, prev_rank, 2, MPI_COMM_WORLD, &send_requests[0]);
+    }
+    
+    if (next_count > 0) {
+        MPI_Isend(to_send_next.par, next_count * sizeof(particle_t), MPI_PARTICLE_T, next_rank, 3, MPI_COMM_WORLD, &send_requests[1]);
+    }
+    
+    if (incoming_prev_count > 0 || incoming_next_count > 0) {
+        MPI_Waitall(2, recv_requests, statuses);
+    }
+    
+
+    if (incoming_prev_count > 0) {
+        for (int i = 0; i < incoming_prev_count; i++) {
+            x = rcv_prev_par[i].x;
+            y = rcv_prev_par[i].y;
+
+            double grid_x_aux = x / cell_size;
+            int grid_x = (int)grid_x_aux;
+        
+            double grid_y_aux = y / cell_size;
+            int grid_y = (int)grid_y_aux;
+        
+            int new_cell = grid_x * grid_size + grid_y;
+            
+            st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
+            st_par[new_cell].n_particles++;
+            
+            if(st_par[new_cell].n_particles == st_par[new_cell].size){
+                realloc(st_par[new_cell].par, st_par[new_cell].size * 2);
+                st_par[new_cell].size *= 2;
+            }
+        }
+        free(rcv_prev_par);
+    }
+    if (incoming_next_count > 0) {
+        for (int i = 0; i < incoming_next_count; i++) {
+            x = rcv_next_par[i].x;
+            y = rcv_next_par[i].y;
+
+            double grid_x_aux = x / cell_size;
+            int grid_x = (int)grid_x_aux;
+        
+            double grid_y_aux = y / cell_size;
+            int grid_y = (int)grid_y_aux;
+        
+            int new_cell = grid_x * grid_size + grid_y;
+            
+            st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_next_par[i];
+            st_par[new_cell].n_particles++;
+
+            if(st_par[new_cell].n_particles == st_par[new_cell].size){
+                realloc(st_par[new_cell].par, st_par[new_cell].size * 2);
+                st_par[new_cell].size *= 2;
+            }
+        }
+        free(rcv_next_par);
+    }
+    // Wait for sends to complete (if any)
+    if (prev_count > 0 || next_count > 0) {
+        MPI_Waitall(2, send_requests, statuses);
+    }
 }
 
 
@@ -433,13 +575,29 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     
 }
 
+void print_result(parcell* st_par, int local_collisions){
+
+    int total_collisions;
+
+    for (int i=0; i<work_size; i++){
+        for(int j=0; j<st_par[i].n_particles, j++){
+            if (st_par[i].par[j].id == 0)
+                fprintf(stdout, "%.3f %.3f\n", st_par[i].par[j].x, st_par[i].par[j].y);
+        }
+    }
+    
+    MPI_Reduce(&local_collisions, &total_collisions, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if (rank == 0){
+        fprintf(stdout, "%d\n", &total_collisions);
+    }
+}
+
 int main(int argc, char *argv[]){
     //read args values
     double exec_time;
     int colisions;
     long sseed;
-    int rank, psize;
-    start_point = rank*work_size;
     
     if (argc != 6) {
         fprintf(stderr, "Usage: %s <seed> <space_size> <grid_size> <num_particles> <num_timesteps>\n", argv[0]);
@@ -458,7 +616,9 @@ int main(int argc, char *argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &psize); 
     
+    start_point = rank*work_size;
     create_mpi_center_mass_type();
+    create_mpi_particle_t();
     
     work_size = (grid_size*grid_size)/psize;
     
@@ -472,21 +632,17 @@ int main(int argc, char *argv[]){
 
     center_mass* cells = malloc((grid_size*grid_size) * sizeof(center_mass)); 
     
-    
-    //center_mas * reccells = malloc(work_size * sizeof(center_mass))
-
-    //MPI_Bcast(sendcells, work_size, type, root, MPI_COMM_WORLD);
-    
-    
     init_particles(sseed, space_size, grid_size, num_particles, particles);
 
     exec_time = -omp_get_wtime();
     
-    colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
+    int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
+
     exec_time += omp_get_wtime();
     
-    print_result(particles[0].x, particles[0].y, colisions);
+    print_result(particles, local_colisions);
     fprintf(stderr, "%.1fs\n", exec_time);
+    
     
     MPI_Finalize();
     free(particles);
