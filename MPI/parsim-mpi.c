@@ -217,9 +217,9 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
             if ( par[i-start_point].par[j].alive == 0)
                 continue;
 
-            cm[j].M +=  par[i-start_point].par[j].m;
-            cm[j].X += ( par[i-start_point].par[j].m *  par[i-start_point].par[j].x);
-            cm[j].Y += ( par[i-start_point].par[j].m *  par[i-start_point].par[j].y);
+            cm[i].M +=  par[i-start_point].par[j].m;
+            cm[i].X += ( par[i-start_point].par[j].m *  par[i-start_point].par[j].x);
+            cm[i].Y += ( par[i-start_point].par[j].m *  par[i-start_point].par[j].y);
         
         }
 
@@ -586,7 +586,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         printf("Antes Check colssions , Rank %d:\n", rank);
     
         for(int n=0; n<collision_count; n++){
-            printf("ALERTA COLISAO , Rank %d:\n", rank);
+            printf("ALERTA GAYZAO, Rank %d:\n", rank);
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
             st_par[colision[n].cell].par[colision[n].b].alive = 0;
             for(int m=n+1; m<collision_count; m++){
