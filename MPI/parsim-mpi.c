@@ -140,7 +140,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
                 if(par[id_aux].par == NULL){
                     fprintf(stderr, "Memory reallocation failed\n");
-                    MPI_Abort(MPI_COMM_WORLD, 1)
+                    MPI_Abort(MPI_COMM_WORLD, 1);
                 }
             }
         }
