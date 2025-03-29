@@ -234,7 +234,6 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     }
     center_mass* send;
-    printf("Final Calculo centro de massa, Rank: %d\n", rank);
     send = &cm[start_point];
     printf("Antes Broadcast, Rank %d:\n", rank);
 
@@ -445,12 +444,12 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     //ParColision colision[num_particles];
     particle_t *px,*py;
 
-    printf("Entrou simulation 2 , Rank %d:\n", rank);
+    
     for(int t = 0; t < num_timesteps; t++){
         calc_center_mass(cells, num_particles, st_par, space_size, grid_size);
-        
+        printf("Antes Wrap , Rank %d:\n", rank);
 
-        for(int j=start_point; j<start_point + work_size ;j++){
+        for(int j=0; j< work_size ;j++){
 
             for(int k = 0; k<st_par[j].n_particles; k++){  
 
@@ -558,7 +557,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         cell_calculation(st_par, grid_size, space_size);
         printf("Saiu Cell_calculation , Rank %d:\n", rank);
 
-        for(int j=start_point; j<start_point + work_size ;j++){
+        for(int j=0; j<work_size ;j++){
 
             for (int idx_a=0; idx_a < st_par[j].n_particles; idx_a++){
                 for (int idx_b=idx_a+1; idx_b < st_par[j].n_particles; idx_b++){
