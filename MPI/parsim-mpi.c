@@ -233,8 +233,9 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
         cm[i].Y /= cm[i].M;
 
     }
+    center_mass* send;
     printf("Final Calculo centro de massa, Rank: %d\n", rank);
-    center_mass* send = cm + (work_size * sizeof(center_mass) * rank);
+    send = &cm[start_point];
     printf("Antes Broadcast, Rank %d:\n", rank);
 
     MPI_Bcast(send, work_size, MPI_CENTER_MASS, rank, MPI_COMM_WORLD);
