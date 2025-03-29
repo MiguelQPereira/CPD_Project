@@ -290,7 +290,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             double grid_y_aux = y / cell_size;
             int grid_y = (int)grid_y_aux;
         
-            int new_cell = grid_x * grid_size + grid_y;
+            int new_cell = (grid_x * grid_size + grid_y) - start_point;
             
             
             if (new_cell != cell){
