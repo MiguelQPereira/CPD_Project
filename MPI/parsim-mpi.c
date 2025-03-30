@@ -344,7 +344,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     MPI_Status statuses[2];
 
     int incoming_prev_count = 0, incoming_next_count = 0;
-
+    printf("Falhou 1");
     MPI_Irecv(&incoming_prev_count, 1, MPI_INT, prev_rank, 1, MPI_COMM_WORLD, &recv_requests[0]);
     MPI_Irecv(&incoming_next_count, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &recv_requests[1]);
     printf("Falhou 1\n");
