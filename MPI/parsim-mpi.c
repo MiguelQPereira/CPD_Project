@@ -252,7 +252,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     to_send_prev.par = malloc(work_size * sizeof(particle_t));
     to_send_prev.size = work_size;
     to_send_prev.n_particles = 0;
-    step("0");
+    printf("step 0");
 
     for(int cell = 0; cell < work_size; cell++){
         for (int id_par=0; id_par < st_par[cell].n_particles; id_par++){
