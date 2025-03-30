@@ -55,13 +55,11 @@ typedef struct {
     int cell;
 } ParColision;
 
-void init_r4uni(int input_seed)
-{
+void init_r4uni(int input_seed){
     seed = input_seed + 987654321;
 }
 
-double rnd_uniform01()
-{
+double rnd_uniform01(){
     int seed_in = seed;
     seed ^= (seed << 13);
     seed ^= (seed >> 17);
@@ -69,8 +67,7 @@ double rnd_uniform01()
     return 0.5 + 0.2328306e-09 * (seed_in + (int) seed);
 }
 
-double rnd_normal01()
-{
+double rnd_normal01(){
     double u1, u2, z, result;
     do {
         u1 = rnd_uniform01();
@@ -81,8 +78,7 @@ double rnd_normal01()
     return result;
 }
 
-void init_particles(long seed, double side, long ncside, long long n_part, parcell *par)
-{   
+void init_particles(long seed, double side, long ncside, long long n_part, parcell *par){   
     double (*rnd01)() = rnd_uniform01;
     long long i;
     particle_t aux;
@@ -120,7 +116,6 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
         double grid_y_aux = aux.y / side;
         int grid_y = (int)grid_y_aux;
-
         int id_aux = grid_x * ncside + grid_y;
         
         if (id_aux >= start_point && id_aux < start_point+work_size){
@@ -263,12 +258,13 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             x = st_par[cell].par[id_par].x;
             y = st_par[cell].par[id_par].y;
 
+            printf("step 1");
             if(x<0){
                 x = space_size;
                 st_par[cell].par[id_par].x += space_size;
             }
                 
-        
+            
             if(y<0){
                 y += space_size;
                 st_par[cell].par[id_par].y += space_size;
@@ -292,41 +288,48 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
             
-            
+            printf("step 2");
             if (new_cell != cell){
                 if (new_cell < 0){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
-
+                    printf("step 3");
                     if(to_send_prev.n_particles == to_send_prev.size){
                         to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
                         to_send_prev.size *= 2;
+                        printf("step 4");
                     }
 
                 }
                 else if (new_cell > work_size){
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
+                    printf("step 5");
 
                     if(to_send_next.n_particles == to_send_next.size){
                         to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
                         to_send_next.size *= 2;
+                        printf("step 6");
                     }
 
                 }else{
                     st_par[new_cell].par[st_par[new_cell].n_particles] = st_par[cell].par[id_par];
                     st_par[new_cell].n_particles++;
+                    printf("step 7");
 
                     if(st_par[new_cell].n_particles == st_par[new_cell].size){
                         st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
                         st_par[new_cell].size *= 2;
+                        printf("step 8");
                     }
                 }
         
                 if (id_par != st_par[cell].n_particles-1){
                     st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1]; 
+                    printf("step 9");
                 }
                 st_par[cell].n_particles--;
+                printf("step 10");
             }
         }
     }
@@ -355,7 +358,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
     MPI_Waitall(2, recv_requests, statuses);
     MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
-
+    printf("step 8");
     // Allocate receive buffers
     if (incoming_prev_count > 0) {
         rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
@@ -378,7 +381,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         MPI_Waitall(2, recv_requests, statuses);
     }
     
-
+    printf("step 9");
     if (incoming_prev_count > 0) {
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
@@ -679,4 +682,5 @@ int main(int argc, char *argv[]){
     
     MPI_Finalize();
     free(particles);
+    free(cells);
 }
