@@ -356,6 +356,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     }
 
     printf("Inicio Comunicacao , Rank %d:\n", rank);
+    int recv_count = 0;
     int prev_rank = (rank - 1 + psize) % psize;
     int next_rank = (rank + 1) % psize;
 
@@ -383,30 +384,37 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
     printf("RANK: %d , Incoming prev: %d,Incoming next: %d,send prev: %d, next send %d \n",rank, incoming_prev_count, incoming_next_count,prev_count,next_count );
     if (incoming_prev_count > 0) {
+        recv_count++;
         rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
-        MPI_Irecv(&rcv_prev_par, incoming_prev_count, MPI_PARTICLE_T, prev_rank, 3, MPI_COMM_WORLD, &recv_requests[0]);       
+        MPI_Irecv(rcv_prev_par, incoming_prev_count, MPI_PARTICLE_T, prev_rank, 3, MPI_COMM_WORLD, &recv_requests[0]);       
         printf("RANK: %d , receive pre par %lld \n",rank, rcv_prev_par[0].id);
 
     }    
     if (incoming_next_count > 0) {
+        recv_count++;
         rcv_next_par = malloc(incoming_next_count * sizeof(particle_t));
-        MPI_Irecv(&rcv_next_par, incoming_next_count, MPI_PARTICLE_T,next_rank, 2, MPI_COMM_WORLD, &recv_requests[1]);
+        MPI_Irecv(rcv_next_par, incoming_next_count, MPI_PARTICLE_T,next_rank, 2, MPI_COMM_WORLD, &recv_requests[1]);
         printf("RANK: %d , receive next par %lld \n",rank, rcv_next_par[0].id);
     }
     
     if (prev_count > 0) {
-        MPI_Isend(&to_send_prev.par, prev_count, MPI_PARTICLE_T, prev_rank, 2, MPI_COMM_WORLD, &send_requests[0]);
+        MPI_Isend(to_send_prev.par, prev_count, MPI_PARTICLE_T, prev_rank, 2, MPI_COMM_WORLD, &send_requests[0]);
         printf("RANK: %d , send pre par %lld \n",rank, to_send_prev.par[0].id);
     }
     
     if (next_count > 0) {
-        MPI_Isend(&to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 3, MPI_COMM_WORLD, &send_requests[1]);
+        MPI_Isend(to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 3, MPI_COMM_WORLD, &send_requests[1]);
         printf("RANK: %d , send next par %lld \n",rank, to_send_next.par[0].id);
     }
     
     if (incoming_prev_count > 0 || incoming_next_count > 0) {
         printf("WAIT");
         MPI_Waitall(2, recv_requests, statuses);
+    }
+
+    if (recv_count > 0) {
+        printf("WAIT");
+        MPI_Waitall(recv_count, recv_requests, statuses);
     }
 
     
