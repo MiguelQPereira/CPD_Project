@@ -196,7 +196,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, double cell_size, long grid_size){
     int grid_x;
     int grid_y;
-    printf("Antes Calculo centro de massa, Rank: %d\n", rank);
+    //printf("Antes Calculo centro de massa, Rank: %d\n", rank);
 
     for(int i=start_point; i < start_point+work_size[rank] ;i++){
         
@@ -242,9 +242,10 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     }
     
-    if (rank == 2)
-        printf("\nProcesso %d tem %.3f na celula %d\n", rank, cm[3].M);
-
+    if (rank == 2){
+        for(int i=0; i<grid_size*grid_size; i++)
+            printf("\nProcesso %d tem %.3f na celula ½d\n", rank, cm[i].M, i);
+    }
     
 }
 
@@ -307,7 +308,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
             
             if (new_cell != cell){
-                printf("Celula diferente \n");
+                //printf("Celula diferente \n");
                 if (new_cell < 0){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
@@ -354,7 +355,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
     }
 
-    printf("Inicio Comunicacao , Rank %d:\n", rank);
+    //printf("Inicio Comunicacao , Rank %d:\n", rank);
     int prev_rank = (rank - 1 + psize) % psize;
     int next_rank = (rank + 1) % psize;
 
@@ -367,13 +368,13 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     int incoming_prev_count = 0, incoming_next_count = 0;
     MPI_Irecv(&incoming_prev_count, 1, MPI_INT, prev_rank, 1, MPI_COMM_WORLD, &recv_requests[0]);
     MPI_Irecv(&incoming_next_count, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &recv_requests[1]);
-    printf("Falhou 1\n");
+    //printf("Falhou 1\n");
     int prev_count = to_send_prev.n_particles;
     int next_count = to_send_next.n_particles;
     
     MPI_Isend(&prev_count, 1, MPI_INT, prev_rank, 0, MPI_COMM_WORLD, &send_requests[0]);
     MPI_Isend(&next_count, 1, MPI_INT, next_rank, 1, MPI_COMM_WORLD, &send_requests[1]);
-    printf("Falhou 2\n");
+    //printf("Falhou 2\n");
     MPI_Waitall(2, recv_requests, statuses);
     MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
     // Allocate receive buffers
@@ -470,7 +471,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     for(int t = 0; t < num_timesteps; t++){
         
         calc_center_mass(cells, num_particles, st_par, space_size, grid_size);
-        printf("Antes Wrap , Rank %d:\n", rank);
+        //printf("Antes Wrap , Rank %d:\n", rank);
 
         for(int j=0; j< work_size[rank] ;j++){
 
@@ -577,7 +578,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         }
 
         cell_calculation(st_par, grid_size, space_size);
-        printf("Saiu Cell_calculation , Rank %d:\n", rank);
+        //printf("Saiu Cell_calculation , Rank %d:\n", rank);
 
         for(int j=0; j<work_size[rank] ;j++){
 
@@ -617,7 +618,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         }
     }
     
-    printf("RETURN , Rank %d:\n", rank);
+    //printf("RETURN , Rank %d:\n", rank);
     return collision_count;
     
     
