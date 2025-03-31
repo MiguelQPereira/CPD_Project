@@ -229,8 +229,9 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     }
     center_mass* send;
     send = &cm[0];
-    if (rank == 0)
+    if (rank == 1)
         printf("\nProcesso %d está a mandar o centro de massa da celula %d, massa %.3f\n", rank, start_point, cm[start_point].M);
+    
 
 
     int aux_start=0;
@@ -241,20 +242,9 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     }
     
-    int displs[psize]; // Deslocamentos para receber corretamente
-    int recv_counts[psize]; // Tamanhos diferentes para cada processo
+    if (rank == 2)
+        printf("\nProcesso %d tem %.3f na celula %d\n", rank, cm[3].M);
 
-    // Calcular deslocamentos
-    /*displs[0] = 0;
-    for (int i = 0; i < psize; i++) {
-        recv_counts[i] = work_size[i];
-        if (i > 0) displs[i] = displs[i - 1] + recv_counts[i - 1];
-    }
-
-    MPI_Allgatherv(&cm[start_point], work_size[rank], MPI_CENTER_MASS, cm, recv_counts, displs, MPI_CENTER_MASS, MPI_COMM_WORLD);
-*/
-    if (rank == 1)
-        printf("\nProcesso %d tem %.3f na celula 0\n", rank, cm[0].M);
     
 }
 
@@ -432,12 +422,11 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         //printf("ANTES FREE");
         free(rcv_prev_par);
     }
-    printf("step 1");
     if (incoming_next_count > 0) {
         for (int i = 0; i < incoming_next_count; i++) {
             x = rcv_next_par[i].x;
             y = rcv_next_par[i].y;
-            printf("step 2");
+            
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
         
@@ -450,19 +439,17 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             st_par[new_cell].n_particles++;
 
             if(st_par[new_cell].n_particles == st_par[new_cell].size){
-                printf("step 3");
+                
                 st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
                 st_par[new_cell].size *= 2;
             }
         }
-        printf("step 4");
         free(rcv_next_par);
     }
     // Wait for sends to complete (if any)
     if (prev_count > 0 || next_count > 0) {
         MPI_Waitall(2, send_requests, statuses);
     }
-    printf("step ultimo");
 }
 
 
@@ -589,7 +576,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         
         }
 
-        printf("Antes Cell_calculation , Rank %d:\n", rank);
         cell_calculation(st_par, grid_size, space_size);
         printf("Saiu Cell_calculation , Rank %d:\n", rank);
 
@@ -618,10 +604,9 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
             }                
         }
         
-        printf("Antes Check colssions , Rank %d:\n", rank);
+        //printf("Antes Check colssions , Rank %d:\n", rank);
     
         for(int n=0; n<collision_count; n++){
-            printf("ALERTA GAYZAO, Rank %d:\n", rank);
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
             st_par[colision[n].cell].par[colision[n].b].alive = 0;
             for(int m=n+1; m<collision_count; m++){
