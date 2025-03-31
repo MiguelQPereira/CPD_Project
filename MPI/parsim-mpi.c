@@ -175,6 +175,8 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
             par[local_cell].par[par[local_cell].n_particles].m = aux.m;
             par[local_cell].par[par[local_cell].n_particles].alive = 1;
 
+            printf("ID: %d, \n", local_cell);
+
             par[local_cell].n_particles++;
 
             if (par[local_cell].n_particles == par[local_cell].size){
