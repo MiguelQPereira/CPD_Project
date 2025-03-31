@@ -287,7 +287,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
             
-            printf("NEW CELL: %d, Start_point: %d, Final start: %d\n", newcell, start_point, start_point+work_size);
+            printf("NEW CELL: %d, Start_point: %d, Final start: %d\n", new_cell, start_point, start_point+work_size);
             if (new_cell < 0 || new_cell >= work_size) {
                 //printf("O MIGUEL E GAYZAO");
                 continue;
