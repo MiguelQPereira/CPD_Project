@@ -10,7 +10,7 @@
 #define DELTAT 0.1
 
 unsigned int seed;
-int *work_size; // number of cells that the process computes
+long long *work_size; // number of cells that the process computes
 int rank; // id of the process
 int psize; // number of processes
 int start_point; // global id of first cell in the process
@@ -228,7 +228,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     }
     center_mass* send;
-    send = &cm[start_point];
+    send = &cm[0];
     if (rank == 0)
         printf("\nProcesso %d está a mandar o centro de massa da celula %d, massa %.3f\n", rank, start_point, cm[start_point].M);
 
@@ -240,7 +240,8 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
         aux_start += work_size[i];
 
     }*/
-    MPI_Bcast(&cm[0], work_size[0], MPI_CENTER_MASS, 0, MPI_COMM_WORLD);
+    //printf("Processo %d chegou ao MPI_Bcast com work_size[0]=%lld\n", rank, work_size[0]);
+    MPI_Bcast(send, work_size[0], MPI_CENTER_MASS, 0, MPI_COMM_WORLD);
     
     int displs[psize]; // Deslocamentos para receber corretamente
     int recv_counts[psize]; // Tamanhos diferentes para cada processo
