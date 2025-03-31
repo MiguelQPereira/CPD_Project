@@ -229,7 +229,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     }
     center_mass* send;
     send = &cm[start_point];
-    printf("Antes Broadcast, Rank %d:\n", rank);
+    printf("\nProcesso %d está a mandar\n", rank);
 
     MPI_Bcast(send, work_size, MPI_CENTER_MASS, rank, MPI_COMM_WORLD);
     
