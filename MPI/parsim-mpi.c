@@ -418,13 +418,19 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         printf("RECV COUNT: %d\n", recv_count);
         MPI_Request active_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
         MPI_Status statuses[2];
-        int active_count = 0;
 
-        if (incoming_prev_count > 0) active_requests[active_count++] = recv_requests[0];
-        if (incoming_next_count > 0) active_requests[active_count++] = recv_requests[1];
-
-        if (active_count > 0) {
-            MPI_Waitall(active_count, active_requests, MPI_STATUSES_IGNORE);
+        if (incoming_prev_count > 0 && incoming_next_count > 0) {
+            // Caso 1: Ambos os receives estão ativos - usa Waitall
+            MPI_Waitall(2, recv_requests, MPI_STATUSES_IGNORE);
+        } 
+        else {
+            // Caso 2: Só um receive está ativo - usa Wait diretamente
+            if (incoming_prev_count > 0) {
+                MPI_Wait(&recv_requests[0], MPI_STATUS_IGNORE);
+            }
+            if (incoming_next_count > 0) {
+                MPI_Wait(&recv_requests[1], MPI_STATUS_IGNORE);
+            }
         }
 
         for (int i= 0;i< incoming_prev_count ; i++){
