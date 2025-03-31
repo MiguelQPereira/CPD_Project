@@ -130,6 +130,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
     double (*rnd01)() = rnd_uniform01;
     long long i;
     particle_t aux;
+    double cell_size = (double) side / ncside;
 
     if(seed < 0) {
         rnd01 = rnd_normal01;
@@ -159,10 +160,10 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
         printf("Aux x x: %.3f,Aux y Y : %.3f \n", aux.x, aux.y);
 
-        double grid_x_aux =  aux.x / side;
+        double grid_x_aux =  aux.x / cell_size;
         int grid_x = (int)grid_x_aux;
 
-        double grid_y_aux = aux.y / side;
+        double grid_y_aux = aux.y / cell_size;
         int grid_y = (int)grid_y_aux;
 
         printf("GRid x: %d,grid Y : %d \n", grid_x, grid_y);
