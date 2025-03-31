@@ -318,7 +318,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     }
 
                 }
-                else if (new_cell > work_size[rank]){
+                else if (new_cell >= work_size[rank]){
                     printf("entrou 2");
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
@@ -454,7 +454,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     free(to_send_next.par);
     free(to_send_prev.par);
     free(rcv_prev_par);
-    free(st_par.par);
 }
 
 
@@ -714,7 +713,10 @@ int main(int argc, char *argv[]){
     
     
     MPI_Finalize();
+
     free(particles);
     free(cells);
     free(work_size);
+
+    for(int i = 0; )
 }
