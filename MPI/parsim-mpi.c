@@ -244,7 +244,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     
     if (rank == 2){
         for(int i=0; i<grid_size*grid_size; i++)
-            printf("\nProcesso %d tem %.3f na celula ½d\n", rank, cm[i].M, i);
+            printf("\nProcesso %d tem %.3f na celula %d\n", rank, cm[i].M, i);
     }
     
 }
