@@ -680,7 +680,7 @@ int main(int argc, char *argv[]){
     int remain = (grid_size*grid_size)%psize;
 
     // Compute the number of cells in the process
-    work_size = malloc(psize*sizeof(long long))
+    work_size = malloc(psize*sizeof(long long));
     for (int i=0; i < psize; i++){
         work_size[i] = aux_size;
         if (rank < remain){
