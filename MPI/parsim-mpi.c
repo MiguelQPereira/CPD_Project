@@ -10,7 +10,7 @@
 #define DELTAT 0.1
 
 unsigned int seed;
-long long *work_size; // number of cells that the process computes
+int *work_size; // number of cells that the process computes
 int rank; // id of the process
 int psize; // number of processes
 int start_point; // global id of first cell in the process
