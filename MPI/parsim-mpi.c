@@ -56,6 +56,53 @@ typedef struct {
     int cell;
 } ParColision;
 
+void create_mpi_center_mass_type() {
+    int block_lengths[3] = {1, 1, 1}; 
+    MPI_Aint offsets[3];
+    MPI_Datatype types[3] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, }; 
+
+    offsets[0] = offsetof(center_mass, X);
+    offsets[1] = offsetof(center_mass, Y);
+    offsets[2] = offsetof(center_mass, M);
+
+    MPI_Type_create_struct(3, block_lengths, offsets, types, &MPI_CENTER_MASS);
+    MPI_Type_commit(&MPI_CENTER_MASS);
+}
+
+
+void create_mpi_particle_t(){
+    MPI_Aint displacements[11];
+    int blocklengths[11] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    MPI_Datatype types[11] = {
+        MPI_LONG_LONG,  // id
+        MPI_DOUBLE,     // x
+        MPI_DOUBLE,     // y
+        MPI_DOUBLE,     // vx
+        MPI_DOUBLE,     // vy
+        MPI_DOUBLE,     // Fx
+        MPI_DOUBLE,     // Fy
+        MPI_DOUBLE,     // ax
+        MPI_DOUBLE,     // ay
+        MPI_DOUBLE,     // m
+        MPI_INT         // alive
+    };
+
+    displacements[0] = offsetof(particle_t, id);
+    displacements[1] = offsetof(particle_t, x);
+    displacements[2] = offsetof(particle_t, y);
+    displacements[3] = offsetof(particle_t, vx);
+    displacements[4] = offsetof(particle_t, vy);
+    displacements[5] = offsetof(particle_t, Fx);
+    displacements[6] = offsetof(particle_t, Fy);
+    displacements[7] = offsetof(particle_t, ax);
+    displacements[8] = offsetof(particle_t, ay);
+    displacements[9] = offsetof(particle_t, m);
+    displacements[10] = offsetof(particle_t, alive);
+
+    MPI_Type_create_struct(11, blocklengths, displacements, types, &MPI_PARTICLE_T);
+    MPI_Type_commit(&MPI_PARTICLE_T);
+}
+
 void init_r4uni(int input_seed){
     seed = input_seed + 987654321;
 }
@@ -146,54 +193,6 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 }
 
 
-void create_mpi_center_mass_type() {
-    int block_lengths[3] = {1, 1, 1}; 
-    MPI_Aint offsets[3];
-    MPI_Datatype types[3] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, }; 
-
-    offsets[0] = offsetof(center_mass, X);
-    offsets[1] = offsetof(center_mass, Y);
-    offsets[2] = offsetof(center_mass, M);
-
-    MPI_Type_create_struct(3, block_lengths, offsets, types, &MPI_CENTER_MASS);
-    MPI_Type_commit(&MPI_CENTER_MASS);
-}
-
-
-void create_mpi_particle_t(){
-    MPI_Aint displacements[11];
-    int blocklengths[11] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    MPI_Datatype types[11] = {
-        MPI_LONG_LONG,  // id
-        MPI_DOUBLE,     // x
-        MPI_DOUBLE,     // y
-        MPI_DOUBLE,     // vx
-        MPI_DOUBLE,     // vy
-        MPI_DOUBLE,     // Fx
-        MPI_DOUBLE,     // Fy
-        MPI_DOUBLE,     // ax
-        MPI_DOUBLE,     // ay
-        MPI_DOUBLE,     // m
-        MPI_INT         // alive
-    };
-
-    displacements[0] = offsetof(particle_t, id);
-    displacements[1] = offsetof(particle_t, x);
-    displacements[2] = offsetof(particle_t, y);
-    displacements[3] = offsetof(particle_t, vx);
-    displacements[4] = offsetof(particle_t, vy);
-    displacements[5] = offsetof(particle_t, Fx);
-    displacements[6] = offsetof(particle_t, Fy);
-    displacements[7] = offsetof(particle_t, ax);
-    displacements[8] = offsetof(particle_t, ay);
-    displacements[9] = offsetof(particle_t, m);
-    displacements[10] = offsetof(particle_t, alive);
-
-    MPI_Type_create_struct(11, blocklengths, displacements, types, &MPI_PARTICLE_T);
-    MPI_Type_commit(&MPI_PARTICLE_T);
-}
-
-
 void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, double cell_size, long grid_size){
     int grid_x;
     int grid_y;
@@ -244,8 +243,19 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     
     
     //MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL,&cm[start_point], work_size[rank], MPI_CENTER_MASS,MPI_COMM_WORLD);
-    MPI_Allgather(&cm[start_point], work_size[rank], MPI_CENTER_MASS, cm, (grid_size*grid_size), MPI_CENTER_MASS, MPI_COMM_WORLD);
+    //MPI_Allgather(&cm[start_point], work_size[rank], MPI_CENTER_MASS, cm, (grid_size*grid_size), MPI_CENTER_MASS, MPI_COMM_WORLD);
 
+    int displs[psize]; // Deslocamentos para receber corretamente
+    int recv_counts[psize]; // Tamanhos diferentes para cada processo
+
+    // Calcular deslocamentos
+    displs[0] = 0;
+    for (int i = 0; i < psize; i++) {
+        recv_counts[i] = work_size[i];
+        if (i > 0) displs[i] = displs[i - 1] + recv_counts[i - 1];
+    }
+
+    MPI_Allgatherv(&cm[start_point], work_size[rank], MPI_CENTER_MASS, cm, recv_counts, displs, MPI_CENTER_MASS, MPI_COMM_WORLD);
 
     if (rank == 1)
         printf("\nProcesso %d tem %.3f na celula 0\n", rank, cm[0].M);
@@ -304,7 +314,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
             
-            printf("NEW CELL: %d, Start_point: %d, Final start: %d\n", new_cell, start_point, start_point+work_size[rank]);
+            //printf("NEW CELL: %d, Start_point: %d, Final start: %d\n", new_cell, start_point, start_point+work_size[rank]);
             if (new_cell < 0 || new_cell >= work_size[rank]) {
                 //printf("O MIGUEL E GAYZAO");
                 continue;
