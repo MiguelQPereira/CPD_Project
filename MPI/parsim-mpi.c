@@ -229,9 +229,13 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     }
     center_mass* send;
     send = &cm[start_point];
-    printf("\nProcesso %d está a mandar o centro de massa %.3f da celula %d\n", rank, send->M);
+    if (rank == 0)
+        printf("\nProcesso %d está a mandar o centro de massa da celula %d, massa %.3f\n", rank, start_point, cm[start_point].M);
 
     MPI_Bcast(send, work_size, MPI_CENTER_MASS, rank, MPI_COMM_WORLD);
+
+    if (rank == 1)
+        printf("\nProcesso %d tem %.3f na celula 0\n", rank, cm[0].M);
     
 }
 
@@ -352,7 +356,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     MPI_Status statuses[2];
 
     int incoming_prev_count = 0, incoming_next_count = 0;
-    printf("Falhou 1");
     MPI_Irecv(&incoming_prev_count, 1, MPI_INT, prev_rank, 1, MPI_COMM_WORLD, &recv_requests[0]);
     MPI_Irecv(&incoming_next_count, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &recv_requests[1]);
     printf("Falhou 1\n");
@@ -364,7 +367,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     printf("Falhou 2\n");
     MPI_Waitall(2, recv_requests, statuses);
     MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
-    printf("Falhou 2\n");
     // Allocate receive buffers
     if (incoming_prev_count > 0) {
         rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
@@ -386,7 +388,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     if (incoming_prev_count > 0 || incoming_next_count > 0) {
         MPI_Waitall(2, recv_requests, statuses);
     }
-    printf("Falhou 3\n");
     //printf("Incoming: %d", incoming_prev_count);
     if (incoming_prev_count > 0) {
         for (int i = 0; i < incoming_prev_count; i++) {
