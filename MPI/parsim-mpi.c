@@ -680,7 +680,7 @@ int main(int argc, char *argv[]){
                 work_size[i] ++;
             }
     }
-    printf("Rank %d; worksize 0: %d", rank, work_size[0]);
+    printf("Rank %d; worksize 0: %d\n", rank, work_size[0]);
     
     
 
