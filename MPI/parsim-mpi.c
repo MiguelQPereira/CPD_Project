@@ -389,17 +389,17 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     if (incoming_next_count > 0) {
         rcv_next_par = malloc(incoming_next_count * sizeof(particle_t));
         MPI_Irecv(rcv_next_par, incoming_next_count, MPI_PARTICLE_T,next_rank, 2, MPI_COMM_WORLD, &recv_requests[1]);
-        printf("RANK: %d , receive pre par %lld \n",rank, rcv_next_par[0].id);
+        printf("RANK: %d , receive next par %lld \n",rank, rcv_next_par[0].id);
     }
     
     if (prev_count > 0) {
         MPI_Isend(to_send_prev.par, prev_count, MPI_PARTICLE_T, prev_rank, 2, MPI_COMM_WORLD, &send_requests[0]);
-        printf("RANK: %d , receive pre par %lld \n",rank, to_send_prev.par[0].id);
+        printf("RANK: %d , send pre par %lld \n",rank, to_send_prev.par[0].id);
     }
     
     if (next_count > 0) {
         MPI_Isend(to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 3, MPI_COMM_WORLD, &send_requests[1]);
-        printf("RANK: %d , receive pre par %lld \n",rank, to_send_next.par[0].id);
+        printf("RANK: %d , send next par %lld \n",rank, to_send_next.par[0].id);
     }
     
     if (incoming_prev_count > 0 || incoming_next_count > 0) {
