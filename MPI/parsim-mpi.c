@@ -13,7 +13,7 @@ unsigned int seed;
 long long *work_size; // number of cells that the process computes
 int rank; // id of the process
 int psize; // number of processes
-int start_point; // global id of first cell in the process
+int start_point=0; // global id of first cell in the process
 
 
 MPI_Datatype MPI_CENTER_MASS;
@@ -229,8 +229,10 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     }
     center_mass* send;
     send = &cm[0];
-    if (rank == 1)
-        printf("\nProcesso %d está a mandar o centro de massa da celula %.3f, massa %.3f\n", rank, start_point, cm[start_point].M);
+    if (rank == 1){
+        printf("\nProcesso %d está a mandar o centro de massa da celula %d, massa %.3f\n", rank, start_point, cm[start_point].M);
+    }
+        
     
 
 
@@ -682,10 +684,12 @@ int main(int argc, char *argv[]){
     }
     printf("Rank %d; worksize 0: %d\n", rank, work_size[0]);
     
-    
+    for (int i=0; i<psize; i++){
+        if(i<rank){
+            start_point += work_size[i];
+        }
+    }
 
-    // Compute the global id of the first cell of the proce
-    start_point = rank*work_size[rank];
     
     particles = malloc(work_size[rank] * sizeof(parcell));
     if(particles == NULL) {
