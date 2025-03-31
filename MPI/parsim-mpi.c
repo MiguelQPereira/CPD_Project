@@ -304,8 +304,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
             
             if (new_cell != cell){
-                //printf("Celula diferente \n");
+                printf("Celula diferente \n");
                 if (new_cell < 0){
+                    printf("entrou 1");
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
                     
@@ -317,6 +318,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
                 }
                 else if (new_cell > work_size[rank]){
+                    printf("entrou 2");
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
                     
@@ -328,6 +330,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     }
 
                 }else{
+                    printf("entrou 3");
                     st_par[new_cell].par[st_par[new_cell].n_particles] = st_par[cell].par[id_par];
                     st_par[new_cell].n_particles++;
                     
@@ -340,12 +343,13 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 }
         
                 if (id_par != st_par[cell].n_particles-1){
+                    printf("entrou 4");
                     st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1]; 
 
                 }
                 
                 st_par[cell].n_particles--;
-                
+                printf("Saiu Celula diferente \n");
             }
         }
         
@@ -469,7 +473,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     for(int t = 0; t < num_timesteps; t++){
         
         calc_center_mass(cells, num_particles, st_par, space_size, grid_size);
-        //printf("Antes Wrap , Rank %d:\n", rank);
+        printf("Antes Wrap , Rank %d:\n", rank);
 
         for(int j=0; j< work_size[rank] ;j++){
 
