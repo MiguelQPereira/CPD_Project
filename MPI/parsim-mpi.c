@@ -98,8 +98,6 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
         }
     }
 
-    
-    printf("Antes Init, Rank %d:\n", rank);
     init_r4uni(seed);
 
     for(i = 0; i < n_part; i++) {
@@ -116,6 +114,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
         double grid_y_aux = aux.y / side;
         int grid_y = (int)grid_y_aux;
+        
         int id_aux = grid_x * ncside + grid_y;
         
         if (id_aux >= start_point && id_aux < start_point+work_size){
@@ -199,13 +198,13 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     int grid_y;
     printf("Antes Calculo centro de massa, Rank: %d\n", rank);
 
-    for(int i=start_point; i<start_point + work_size ;i++){
+    for(int i=start_point; i < start_point+work_size ;i++){
         
         cm[i].M = 0;
         cm[i].X = 0;
         cm[i].Y = 0;
 
-        for(int j = 0; j< par[i-start_point].n_particles; j++){
+        for(int j=0; j < par[i-start_point].n_particles; j++){
             par[i-start_point].par[j].Fx = 0;
             par[i-start_point].par[j].Fy = 0;
 
@@ -287,8 +286,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int grid_y = (int)grid_y_aux;
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
+
+            if (new_cell < 0 || new_cell >= work_size) {
+                printf("O MIGUEL E GAYZAO");
+                continue;
+            }
             
             if (new_cell != cell){
+                print("Celula diferente \n");
                 if (new_cell < 0){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
@@ -327,6 +332,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1]; 
 
                 }
+                
                 st_par[cell].n_particles--;
                 
             }
@@ -440,7 +446,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
 
 int simulation(center_mass *cells, double space_size, long grid_size, long long num_particles, long long num_timesteps, parcell *st_par){
-    printf("Entrou simulation , Rank %d:\n", rank);
+
     double delta_x = 0, delta_y = 0; //displacement of the particle in x and y
     int collision_count = 0; //count collisions
     //double cell_size = (double)space_size / grid_size;
@@ -454,6 +460,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
     
     for(int t = 0; t < num_timesteps; t++){
+        
         calc_center_mass(cells, num_particles, st_par, space_size, grid_size);
         printf("Antes Wrap , Rank %d:\n", rank);
 
@@ -663,7 +670,7 @@ int main(int argc, char *argv[]){
         work_size ++;
     }
 
-    // Compute the global id of the first cell of the process
+    // Compute the global id of the first cell of the proce
     start_point = rank*work_size;
     
     particles = malloc(work_size * sizeof(parcell));
@@ -675,11 +682,9 @@ int main(int argc, char *argv[]){
     center_mass* cells = malloc((grid_size*grid_size) * sizeof(center_mass)); 
     
     init_particles(sseed, space_size, grid_size, num_particles, particles);
-    printf("Depois Init, Rank :%d\n", rank);
+
     exec_time = -omp_get_wtime();
-
     int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
-
     exec_time += omp_get_wtime();
     
     print_result(particles, local_colisions);
