@@ -228,8 +228,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     }
     center_mass* send;
-    send = &cm[start_point];
-    if (rank == 0)
+    send = &cm[start_point];pif (rank == 0)
         printf("\nProcesso %d está a mandar o centro de massa da celula %d, massa %.3f\n", rank, start_point, cm[start_point].M);
 
 
@@ -240,23 +239,20 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
         aux_start += work_size[i];
 
     }*/
+    MPI_Bcast(&cm[0], work_size[0], MPI_CENTER_MASS, 0, MPI_COMM_WORLD);
     
-    
-    //MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL,&cm[start_point], work_size[rank], MPI_CENTER_MASS,MPI_COMM_WORLD);
-    //MPI_Allgather(&cm[start_point], work_size[rank], MPI_CENTER_MASS, cm, (grid_size*grid_size), MPI_CENTER_MASS, MPI_COMM_WORLD);
-
     int displs[psize]; // Deslocamentos para receber corretamente
     int recv_counts[psize]; // Tamanhos diferentes para cada processo
 
     // Calcular deslocamentos
-    displs[0] = 0;
+    /*displs[0] = 0;
     for (int i = 0; i < psize; i++) {
         recv_counts[i] = work_size[i];
         if (i > 0) displs[i] = displs[i - 1] + recv_counts[i - 1];
     }
 
     MPI_Allgatherv(&cm[start_point], work_size[rank], MPI_CENTER_MASS, cm, recv_counts, displs, MPI_CENTER_MASS, MPI_COMM_WORLD);
-
+*/
     if (rank == 1)
         printf("\nProcesso %d tem %.3f na celula 0\n", rank, cm[0].M);
     
