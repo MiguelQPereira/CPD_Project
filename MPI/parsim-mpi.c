@@ -230,7 +230,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     }
     center_mass* send;
     send = &cm[0];
-    if (rank == 4){
+    if (rank == 3){
         printf("\nProcesso %d está a mandar o centro de massa da celula %d, massa %.3f\n", rank, start_point, cm[start_point].M);
     }
         
@@ -245,7 +245,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     }
     
-    if (rank == 4){
+    if (rank == 3){
         for(int i=0; i<grid_size*grid_size; i++)
             printf("\nProcesso %d tem %.3f na celula %d\n", rank, cm[i].M, i);
     }
