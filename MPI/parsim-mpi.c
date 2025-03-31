@@ -242,7 +242,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     }
 
-    print("DEPOIS BROAD \n")
+    printf("DEPOIS BROAD \n");
     /*
     if (rank == 3){
         for(int i=0; i<grid_size*grid_size; i++)
@@ -709,4 +709,5 @@ int main(int argc, char *argv[]){
     MPI_Finalize();
     free(particles);
     free(cells);
+    free(work_size);
 }
