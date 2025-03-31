@@ -235,15 +235,16 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
 
     int aux_start=0;
-    for (int i=0; i<psize ; i++){
-        //MPI_Bcast(&cm[aux_start], work_size[i], MPI_CENTER_MASS, i, MPI_COMM_WORLD);
+    
+    /*for (int i=0; i<psize ; i++){
+        MPI_Bcast(&cm[aux_start], work_size[i], MPI_CENTER_MASS, i, MPI_COMM_WORLD);
         aux_start += work_size[i];
 
-    }
+    }*/
     
     
     //MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL,&cm[start_point], work_size[rank], MPI_CENTER_MASS,MPI_COMM_WORLD);
-    //MPI_Allgather(&cm[start_point], work_size[rank], MPI_CENTER_MASS, cm, (grid_size*grid_size), MPI_CENTER_MASS, MPI_COMM_WORLD);
+    MPI_Allgather(&cm[start_point], work_size[rank], MPI_CENTER_MASS, cm, (grid_size*grid_size), MPI_CENTER_MASS, MPI_COMM_WORLD);
 
 
     if (rank == 1)
