@@ -10,10 +10,10 @@
 #define DELTAT 0.1
 
 unsigned int seed;
-long long work_size; // number of cells 
-int rank;
-int psize;
-int start_point;
+long long work_size; // number of cells that the process computes
+int rank; // id of the process
+int psize; // number of processes
+int start_point; // global id of first cell in the process
 
 MPI_Datatype MPI_CENTER_MASS;
 MPI_Datatype MPI_PARTICLE_T;
@@ -380,7 +380,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         MPI_Waitall(2, recv_requests, statuses);
     }
     printf("Falhou 3\n");
-    printf("Incoming: %d", incoming_prev_count);
+    //printf("Incoming: %d", incoming_prev_count);
     if (incoming_prev_count > 0) {
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
@@ -402,7 +402,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 st_par[new_cell].size *= 2;
             }
         }
-        printf("ANTES FREE");
+        //printf("ANTES FREE");
         free(rcv_prev_par);
     }
     printf("step 1");
@@ -647,21 +647,23 @@ int main(int argc, char *argv[]){
 
     parcell* particles;
 
+    // Inicialization of MPI and types to send
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &psize); 
     
     create_mpi_center_mass_type();
     create_mpi_particle_t();
+
     
+    // Compute the number of cells in the process
     work_size = (grid_size*grid_size)/psize;
-    
     int remain = (grid_size*grid_size)%psize;
-    
     if (rank < remain){
         work_size ++;
     }
 
+    // Compute the global id of the first cell of the process
     start_point = rank*work_size;
     
     particles = malloc(work_size * sizeof(parcell));
