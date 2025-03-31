@@ -410,7 +410,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     }
 
     
-    //printf("Incoming: %d", incoming_prev_count);
+    printf("fim comuni\n");
     if (incoming_prev_count > 0) {
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
