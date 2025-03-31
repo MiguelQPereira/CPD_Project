@@ -387,8 +387,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         recv_count++;
         rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
         MPI_Irecv(rcv_prev_par, incoming_prev_count, MPI_PARTICLE_T, prev_rank, 3, MPI_COMM_WORLD, &recv_requests[0]);    
-        for (int i= 0;i< incoming_prev_count , i++){
-            printf("X RECV PREV:  %lf", rcv_prev_par.par[i].x);
+        for (int i= 0;i< incoming_prev_count ; i++){
+            printf("X RECV PREV:  %lf", rcv_prev_par[i].x);
         }   
         printf("RANK: %d , receive pre par %lld \n",rank, rcv_prev_par[0].x);
 
@@ -398,7 +398,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         rcv_next_par = malloc(incoming_next_count * sizeof(particle_t));
         MPI_Irecv(rcv_next_par, incoming_next_count, MPI_PARTICLE_T,next_rank, 2, MPI_COMM_WORLD, &recv_requests[1]);
         for (int i= 0;i< incoming_next_count ; i++){
-            printf("X RECV NEXT %lf", rcv_next_par.par[i].x);
+            printf("X RECV NEXT %lf", rcv_next_par[i].x);
         }
         printf("RANK: %d , receive next par %lld \n",rank, rcv_next_par[0].x);
     }
