@@ -575,8 +575,9 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         
         }
 
+        printf("Entrou Cell_calculation , Rank %d:\n", rank);
         cell_calculation(st_par, grid_size, space_size);
-        //printf("Saiu Cell_calculation , Rank %d:\n", rank);
+        printf("Saiu Cell_calculation , Rank %d:\n", rank);
 
         for(int j=0; j<work_size[rank] ;j++){
 
