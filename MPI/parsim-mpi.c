@@ -240,7 +240,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
         aux_start += work_size[i];
 
     }*/
-    MPI_Bcast(&cm[0], work_size[0], MPI_CENTER_MASS, 0, MPI_COMM_WORLD);
+    MPI_Bcast(cm[0], work_size[0], MPI_CENTER_MASS, 0, MPI_COMM_WORLD);
     
     int displs[psize]; // Deslocamentos para receber corretamente
     int recv_counts[psize]; // Tamanhos diferentes para cada processo
