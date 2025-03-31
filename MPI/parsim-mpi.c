@@ -162,6 +162,8 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
         double grid_y_aux = aux.y / side;
         int grid_y = (int)grid_y_aux;
+
+        printf("GRid x: %d,grid Y : %d \n", grid_x, grid_y);
         
         int id_aux = grid_x * ncside + grid_y;
         
