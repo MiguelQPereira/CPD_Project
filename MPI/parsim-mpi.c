@@ -439,7 +439,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         }
     }
     if (incoming_next_count > 0) {
-        printf("NEXT/n")
+        printf("NEXT/n");
         for (int i = 0; i < incoming_next_count; i++) {
             x = rcv_next_par[i].x;
             y = rcv_next_par[i].y;
