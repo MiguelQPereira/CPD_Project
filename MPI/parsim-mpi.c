@@ -414,16 +414,19 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         //printf("RANK: %d , send next par %d \n",rank, to_send_next.par[0].x);
     }
 
+    /*
     if (recv_count > 0) {
         printf("RECV COUNT: %d\n", recv_count);
-        //MPI_Status statuses[recv_count];
-        //MPI_Waitall(recv_count, recv_requests, statuses);
-
-        int completed;
-        int indices[2];  // No máximo, pode haver 2 receções concluídas
+        MPI_Request active_requests[2];
         MPI_Status statuses[2];
+        int active_count = 0;
 
-        MPI_Waitsome(2, recv_requests, &completed, indices, statuses);
+        if (incoming_prev_count > 0) active_requests[active_count++] = recv_requests[0];
+        if (incoming_next_count > 0) active_requests[active_count++] = recv_requests[1];
+
+        if (active_count > 0) {
+            MPI_Waitall(active_count, active_requests, statuses);
+}
 
         for (int i= 0;i< incoming_prev_count ; i++){
             printf("X RECV PREV:  %lf\n", rcv_prev_par[i].x);
@@ -433,7 +436,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             printf("X RECV NEXT %lf\n", rcv_next_par[i].x);
         }
     }
-
+    */
     printf("SAIU");
 
     if (incoming_prev_count > 0) {
