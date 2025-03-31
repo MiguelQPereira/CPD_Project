@@ -241,6 +241,8 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
         aux_start += work_size[i];
 
     }
+
+    print("DEPOIS BROAD \n")
     /*
     if (rank == 3){
         for(int i=0; i<grid_size*grid_size; i++)
@@ -615,6 +617,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     }
     
     //printf("RETURN , Rank %d:\n", rank);
+    free(colision);
     return collision_count;
     
     
