@@ -236,7 +236,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     int aux_start=0;
     for (int i=0; i<psize ; i++){
-        MPI_Bcast(&cm[aux_start], work_size[i], MPI_CENTER_MASS, i, MPI_COMM_WORLD);
+        //MPI_Bcast(&cm[aux_start], work_size[i], MPI_CENTER_MASS, i, MPI_COMM_WORLD);
         aux_start += work_size[i];
 
     }
