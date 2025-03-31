@@ -149,6 +149,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
     init_r4uni(seed);
 
+    
     for(i = 0; i < n_part; i++) {
 
         aux.x = rnd01() * side;
@@ -197,7 +198,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, double cell_size, long grid_size){
     int grid_x;
     int grid_y;
-    //printf("Antes Calculo centro de massa, Rank: %d\n", rank);
+    printf("Antes Calculo centro de massa, Rank: %d\n", rank);
 
     for(int i=start_point; i < start_point+work_size[rank] ;i++){
         
@@ -348,7 +349,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
     }
 
-    //printf("Inicio Comunicacao , Rank %d:\n", rank);
+    printf("Inicio Comunicacao , Rank %d:\n", rank);
     int prev_rank = (rank - 1 + psize) % psize;
     int next_rank = (rank + 1) % psize;
 
@@ -439,6 +440,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
         }
         free(rcv_next_par);
+        free(to_send_next.par);
+        free(to_send_next);
     }
     // Wait for sends to complete (if any)
     if (prev_count > 0 || next_count > 0) {
