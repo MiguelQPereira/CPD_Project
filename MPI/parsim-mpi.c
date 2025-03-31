@@ -712,7 +712,7 @@ int main(int argc, char *argv[]){
     init_particles(sseed, space_size, grid_size, num_particles, particles);
 
     exec_time = -omp_get_wtime();
-    //int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
+    int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
     exec_time += omp_get_wtime();
     
     print_result(particles, local_colisions);
