@@ -235,13 +235,11 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     int aux_start=0;
     
-    /*for (int i=0; i<psize ; i++){
-        MPI_Bcast(&cm[aux_start], work_size[i], MPI_CENTER_MASS, i, MPI_COMM_WORLD);
+    for (int i=0; i<psize ; i++){
+        MPI_Bcast(&cm[aux_start], 2, MPI_CENTER_MASS, i, MPI_COMM_WORLD);
         aux_start += work_size[i];
 
-    }*/
-    //printf("Processo %d chegou ao MPI_Bcast com work_size[0]=%lld\n", rank, work_size[0]);
-    MPI_Bcast(send, 1, MPI_CENTER_MASS, 0, MPI_COMM_WORLD);
+    }
     
     int displs[psize]; // Deslocamentos para receber corretamente
     int recv_counts[psize]; // Tamanhos diferentes para cada processo
