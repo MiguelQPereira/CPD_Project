@@ -399,7 +399,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     if (incoming_prev_count > 0 || incoming_next_count > 0) {
         MPI_Waitall(2, recv_requests, statuses);
     }
-    //printf("Incoming: %d", incoming_prev_count);
+    printf("Incoming: %d", incoming_prev_count);
     if (incoming_prev_count > 0) {
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
