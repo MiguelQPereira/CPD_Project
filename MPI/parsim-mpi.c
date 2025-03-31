@@ -366,7 +366,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
     MPI_Request num_send_requests[2], num_recv_requests[2];
     MPI_Status num_statuses[2];
-    MPI_Request send_requests[2], recv_requests[2];
+    MPI_Request send_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
+    MPI_Request recv_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
 
     int incoming_prev_count = 0, incoming_next_count = 0;
     MPI_Irecv(&incoming_prev_count, 1, MPI_INT, prev_rank, 1, MPI_COMM_WORLD, &num_recv_requests[0]);
@@ -415,10 +416,11 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
     if (recv_count > 0) {
         printf("RECV COUNT: %d\n", recv_count);
-        MPI_Status statuses[recv_count];
-        MPI_Waitall(recv_count, recv_requests, statuses);
+        MPI_Status statuses[2];
+        //MPI_Waitall(recv_count, recv_requests, statuses);
+        if (incoming_prev_count > 0) MPI_Wait(&recv_requests[0], MPI_STATUS_IGNORE);
+        if (incoming_next_count > 0) MPI_Wait(&recv_requests[1], MPI_STATUS_IGNORE);
 
-        
         for (int i= 0;i< incoming_prev_count ; i++){
             printf("X RECV PREV:  %lf\n", rcv_prev_par[i].x);
         } 
