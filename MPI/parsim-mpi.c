@@ -157,6 +157,8 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
         aux.m = rnd01() * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
 
+        printf("Aux x x: %.3f,Aux y Y : %.3f \n", aux.x, aux.y);
+
         double grid_x_aux =  aux.x / side;
         int grid_x = (int)grid_x_aux;
 
