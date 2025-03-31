@@ -10,10 +10,11 @@
 #define DELTAT 0.1
 
 unsigned int seed;
-long long work_size; // number of cells that the process computes
+long long *work_size; // number of cells that the process computes
 int rank; // id of the process
 int psize; // number of processes
 int start_point; // global id of first cell in the process
+
 
 MPI_Datatype MPI_CENTER_MASS;
 MPI_Datatype MPI_PARTICLE_T;
@@ -88,7 +89,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
         seed = -seed;
     }
 
-    for(int i=0; i < work_size; i++){
+    for(int i=0; i < work_size[rank]; i++){
         par[i].n_particles = 0;
         par[i].size = n_part/(ncside*ncside);
         par[i].par = malloc(par[i].size * sizeof(particle_t));
@@ -117,7 +118,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
         
         int id_aux = grid_x * ncside + grid_y;
         
-        if (id_aux >= start_point && id_aux < start_point+work_size){
+        if (id_aux >= start_point && id_aux < start_point+work_size[rank]){
             int local_cell = id_aux - start_point;
             par[local_cell].par[par[local_cell].n_particles].id = i;
             par[local_cell].par[par[local_cell].n_particles].x = aux.x; 
@@ -198,7 +199,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     int grid_y;
     printf("Antes Calculo centro de massa, Rank: %d\n", rank);
 
-    for(int i=start_point; i < start_point+work_size ;i++){
+    for(int i=start_point; i < start_point+work_size[rank] ;i++){
         
         cm[i].M = 0;
         cm[i].X = 0;
@@ -232,8 +233,18 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     if (rank == 0)
         printf("\nProcesso %d está a mandar o centro de massa da celula %d, massa %.3f\n", rank, start_point, cm[start_point].M);
 
-    MPI_Bcast(send, work_size, MPI_CENTER_MASS, rank, MPI_COMM_WORLD);
-    //MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL,&cm[start_point], work_size, MPI_CENTER_MASS,MPI_COMM_WORLD);
+
+    int aux_start=0;
+    for (int i=0; i<psize ; i++){
+        MPI_Bcast(&cm[aux_start], work_size[i], MPI_CENTER_MASS, i, MPI_COMM_WORLD);
+        aux_start += work_size[i];
+
+    }
+    
+    
+    //MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL,&cm[start_point], work_size[rank], MPI_CENTER_MASS,MPI_COMM_WORLD);
+    //MPI_Allgather(&cm[start_point], work_size[rank], MPI_CENTER_MASS, cm, (grid_size*grid_size), MPI_CENTER_MASS, MPI_COMM_WORLD);
+
 
     if (rank == 1)
         printf("\nProcesso %d tem %.3f na celula 0\n", rank, cm[0].M);
@@ -250,14 +261,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     parcell to_send_prev;
     parcell to_send_next;
 
-    to_send_next.par = malloc(work_size * sizeof(particle_t));
-    to_send_next.size = work_size;
+    to_send_next.par = malloc(work_size[rank] * sizeof(particle_t));
+    to_send_next.size = work_size[rank];
     to_send_next.n_particles = 0;
-    to_send_prev.par = malloc(work_size * sizeof(particle_t));
-    to_send_prev.size = work_size;
+    to_send_prev.par = malloc(work_size[rank] * sizeof(particle_t));
+    to_send_prev.size = work_size[rank];
     to_send_prev.n_particles = 0;
 
-    for(int cell = 0; cell < work_size; cell++){
+    for(int cell = 0; cell < work_size[rank]; cell++){
         for (int id_par=0; id_par < st_par[cell].n_particles; id_par++){
 
             x = st_par[cell].par[id_par].x;
@@ -292,8 +303,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
             
-            printf("NEW CELL: %d, Start_point: %d, Final start: %d\n", new_cell, start_point, start_point+work_size);
-            if (new_cell < 0 || new_cell >= work_size) {
+            printf("NEW CELL: %d, Start_point: %d, Final start: %d\n", new_cell, start_point, start_point+work_size[rank]);
+            if (new_cell < 0 || new_cell >= work_size[rank]) {
                 //printf("O MIGUEL E GAYZAO");
                 continue;
             }
@@ -311,7 +322,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     }
 
                 }
-                else if (new_cell > work_size){
+                else if (new_cell > work_size[rank]){
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
                     
@@ -467,7 +478,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         calc_center_mass(cells, num_particles, st_par, space_size, grid_size);
         printf("Antes Wrap , Rank %d:\n", rank);
 
-        for(int j=0; j< work_size ;j++){
+        for(int j=0; j< work_size[rank] ;j++){
 
             for(int k = 0; k<st_par[j].n_particles; k++){  
 
@@ -575,7 +586,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         cell_calculation(st_par, grid_size, space_size);
         printf("Saiu Cell_calculation , Rank %d:\n", rank);
 
-        for(int j=0; j<work_size ;j++){
+        for(int j=0; j<work_size[rank] ;j++){
 
             for (int idx_a=0; idx_a < st_par[j].n_particles; idx_a++){
                 for (int idx_b=idx_a+1; idx_b < st_par[j].n_particles; idx_b++){
@@ -624,7 +635,7 @@ void print_result(parcell* st_par, int local_collisions){
 
     int total_collisions;
 
-    for (int i=0; i<work_size; i++){
+    for (int i=0; i<work_size[rank]; i++){
         for(int j=0; j<st_par[i].n_particles; j++){
             if (st_par[i].par[j].id == 0)
                 fprintf(stdout, "%.3f %.3f\n", st_par[i].par[j].x, st_par[i].par[j].y);
@@ -665,18 +676,25 @@ int main(int argc, char *argv[]){
     create_mpi_center_mass_type();
     create_mpi_particle_t();
 
-    
-    // Compute the number of cells in the process
-    work_size = (grid_size*grid_size)/psize;
+    int aux_size = (grid_size*grid_size)/psize;
     int remain = (grid_size*grid_size)%psize;
-    if (rank < remain){
-        work_size ++;
+
+    // Compute the number of cells in the process
+    work_size = malloc(psize*sizeof(long long))
+    for (int i=0; i < psize; i++){
+        work_size[i] = aux_size;
+        if (rank < remain){
+                work_size[i] ++;
+            }
     }
+    
+    
+    
 
     // Compute the global id of the first cell of the proce
-    start_point = rank*work_size;
+    start_point = rank*work_size[rank];
     
-    particles = malloc(work_size * sizeof(parcell));
+    particles = malloc(work_size[rank] * sizeof(parcell));
     if(particles == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
