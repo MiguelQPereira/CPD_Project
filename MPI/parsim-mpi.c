@@ -10,7 +10,7 @@
 #define DELTAT 0.1
 
 unsigned int seed;
-long long work_size;
+long long work_size; // number of cells 
 int rank;
 int psize;
 int start_point;
@@ -331,9 +331,10 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 
             }
         }
+        
     }
 
-    printf("Inicio Comunicaçao , Rank %d:\n", rank);
+    printf("Inicio Comunicacao , Rank %d:\n", rank);
     int prev_rank = (rank - 1 + psize) % psize;
     int next_rank = (rank + 1) % psize;
 
@@ -350,7 +351,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     printf("Falhou 1\n");
     int prev_count = to_send_prev.n_particles;
     int next_count = to_send_next.n_particles;
-    
     
     MPI_Isend(&prev_count, 1, MPI_INT, prev_rank, 0, MPI_COMM_WORLD, &send_requests[0]);
     MPI_Isend(&next_count, 1, MPI_INT, next_rank, 1, MPI_COMM_WORLD, &send_requests[1]);
@@ -380,6 +380,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         MPI_Waitall(2, recv_requests, statuses);
     }
     printf("Falhou 3\n");
+    printf("Incoming: %d", incoming_prev_count);
     if (incoming_prev_count > 0) {
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
@@ -401,6 +402,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 st_par[new_cell].size *= 2;
             }
         }
+        printf("ANTES FREE");
         free(rcv_prev_par);
     }
     printf("step 1");
