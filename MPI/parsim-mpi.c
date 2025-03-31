@@ -293,7 +293,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
             
             if (new_cell != cell){
-                print("Celula diferente \n");
+                printf("Celula diferente \n");
                 if (new_cell < 0){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
