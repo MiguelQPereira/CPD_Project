@@ -411,7 +411,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
     if (recv_count > 0) {
         printf("WAIT");
-        MPI_Status num_statuses[recv_count];
+        MPI_Status statuses[recv_count];
         MPI_Waitall(recv_count, recv_requests, statuses);
     }
 
@@ -465,7 +465,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     // Wait for sends to complete (if any)
     if (prev_count > 0 || next_count > 0) {
         printf("wait 2 2/n");
-        MPI_Status num_statuses[send_count];
+        MPI_Status statuses[send_count];
         MPI_Waitall(send_count, send_requests, statuses);
     }
     
