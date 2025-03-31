@@ -414,8 +414,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 st_par[new_cell].size *= 2;
             }
         }
-        //printf("ANTES FREE");
-        free(rcv_prev_par);
     }
     if (incoming_next_count > 0) {
         for (int i = 0; i < incoming_next_count; i++) {
@@ -439,14 +437,16 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 st_par[new_cell].size *= 2;
             }
         }
-        free(rcv_next_par);
-        free(to_send_next.par);
-        free(to_send_next);
     }
     // Wait for sends to complete (if any)
     if (prev_count > 0 || next_count > 0) {
         MPI_Waitall(2, send_requests, statuses);
     }
+
+    free(rcv_next_par);
+    free(to_send_next.par);
+    free(to_send_prev.par);
+    free(rcv_prev_par);
 }
 
 
