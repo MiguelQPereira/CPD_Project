@@ -232,7 +232,8 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     if (rank == 0)
         printf("\nProcesso %d está a mandar o centro de massa da celula %d, massa %.3f\n", rank, start_point, cm[start_point].M);
 
-    MPI_Bcast(send, work_size, MPI_CENTER_MASS, rank, MPI_COMM_WORLD);
+    //MPI_Bcast(send, work_size, MPI_CENTER_MASS, rank, MPI_COMM_WORLD);
+    MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL,&cm[start_point], work_size, MPI_CENTER_MASS,MPI_COMM_WORLD);
 
     if (rank == 1)
         printf("\nProcesso %d tem %.3f na celula 0\n", rank, cm[0].M);
