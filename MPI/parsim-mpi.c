@@ -230,13 +230,9 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     }
     center_mass* send;
     send = &cm[0];
-    if (rank == 3){
+    /*if (rank == 3){
         printf("\nProcesso %d está a mandar o centro de massa da celula %d, massa %.3f\n", rank, start_point, cm[start_point].M);
-    }
-        
-    
-
-
+    }*/
     int aux_start=0;
     
     for (int i=0; i<psize ; i++){
@@ -244,11 +240,11 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
         aux_start += work_size[i];
 
     }
-    
+    /*
     if (rank == 3){
         for(int i=0; i<grid_size*grid_size; i++)
             printf("\nProcesso %d tem %.3f na celula %d\n", rank, cm[i].M, i);
-    }
+    }*/
     
 }
 
@@ -303,12 +299,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int grid_y = (int)grid_y_aux;
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
-            
-            //printf("NEW CELL: %d, Start_point: %d, Final start: %d\n", new_cell, start_point, start_point+work_size[rank]);
-            if (new_cell < 0 || new_cell >= work_size[rank]) {
-                //printf("O MIGUEL E GAYZAO");
-                continue;
-            }
             
             if (new_cell != cell){
                 //printf("Celula diferente \n");
