@@ -401,7 +401,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             printf("SEND X PRREV : %lf\n", to_send_prev.par[i].x);
         }
         MPI_Isend(to_send_prev.par, prev_count, MPI_PARTICLE_T, prev_rank, 2, MPI_COMM_WORLD, &send_requests[0]);
-        printf("RANK: %d , send pre par %d \n",rank, to_send_prev.par[0].x);
+        //printf("RANK: %d , send pre par %lf \n",rank, to_send_prev.par[0].x);
     }
     
     if (next_count > 0) {
@@ -410,11 +410,10 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             printf("SEND X NEXT  %lf\n", to_send_next.par[i].x);
         }
         MPI_Isend(to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 3, MPI_COMM_WORLD, &send_requests[1]);
-        printf("RANK: %d , send next par %d \n",rank, to_send_next.par[0].x);
+        //printf("RANK: %d , send next par %d \n",rank, to_send_next.par[0].x);
     }
 
     if (recv_count > 0) {
-        printf("WAIT");
         MPI_Status statuses[recv_count];
         MPI_Waitall(recv_count, recv_requests, statuses);
         for (int i= 0;i< incoming_prev_count ; i++){
@@ -425,6 +424,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             printf("X RECV NEXT %lf\n", rcv_next_par[i].x);
         }
     }
+
+    printf("SAIU");
 
     if (incoming_prev_count > 0) {
         printf("PREV /n");
