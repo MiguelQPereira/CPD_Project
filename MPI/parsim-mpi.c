@@ -379,27 +379,29 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     MPI_Waitall(2, recv_requests, statuses);
     MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
     // Allocate receive buffers
+
+    printf("Incoming prev: %d,Incoming next: %d,send prev: %d, next send %d \n", incoming_prev_count, incoming_next_count,prev_count,next_count );
     if (incoming_prev_count > 0) {
-        rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
-        MPI_Irecv(rcv_prev_par, incoming_prev_count * sizeof(particle_t), MPI_PARTICLE_T, prev_rank, 3, MPI_COMM_WORLD, &recv_requests[0]);        
+        //rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
+        //MPI_Irecv(rcv_prev_par, incoming_prev_count * sizeof(particle_t), MPI_PARTICLE_T, prev_rank, 3, MPI_COMM_WORLD, &recv_requests[0]);        
     }
     if (incoming_next_count > 0) {
-        rcv_next_par = malloc(incoming_next_count * sizeof(particle_t));
-        MPI_Irecv(rcv_next_par, incoming_next_count * sizeof(particle_t), MPI_PARTICLE_T,next_rank, 2, MPI_COMM_WORLD, &recv_requests[1]);
+        //rcv_next_par = malloc(incoming_next_count * sizeof(particle_t));
+        //MPI_Irecv(rcv_next_par, incoming_next_count * sizeof(particle_t), MPI_PARTICLE_T,next_rank, 2, MPI_COMM_WORLD, &recv_requests[1]);
     }
     
     if (prev_count > 0) {
-        MPI_Isend(to_send_prev.par, prev_count *sizeof(particle_t), MPI_PARTICLE_T, prev_rank, 2, MPI_COMM_WORLD, &send_requests[0]);
+        //MPI_Isend(to_send_prev.par, prev_count *sizeof(particle_t), MPI_PARTICLE_T, prev_rank, 2, MPI_COMM_WORLD, &send_requests[0]);
     }
     
     if (next_count > 0) {
-        MPI_Isend(to_send_next.par, next_count * sizeof(particle_t), MPI_PARTICLE_T, next_rank, 3, MPI_COMM_WORLD, &send_requests[1]);
+        //MPI_Isend(to_send_next.par, next_count * sizeof(particle_t), MPI_PARTICLE_T, next_rank, 3, MPI_COMM_WORLD, &send_requests[1]);
     }
     
     if (incoming_prev_count > 0 || incoming_next_count > 0) {
-        MPI_Waitall(2, recv_requests, statuses);
+        //MPI_Waitall(2, recv_requests, statuses);
     }
-    printf("Incoming: %d", incoming_prev_count);
+    //printf("Incoming: %d", incoming_prev_count);
     if (incoming_prev_count > 0) {
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
