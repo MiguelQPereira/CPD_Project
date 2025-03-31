@@ -229,7 +229,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     }
     center_mass* send;
     send = &cm[start_point];
-    printf("\nProcesso %d está a mandar\n", rank);
+    printf("\nProcesso %d está a mandar o centro de massa %.3f da celula %d\n", rank, send->M);
 
     MPI_Bcast(send, work_size, MPI_CENTER_MASS, rank, MPI_COMM_WORLD);
     
@@ -286,9 +286,10 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int grid_y = (int)grid_y_aux;
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
-
+            
+            printf("NEW CELL: %d, Start_point: %d, Final start: %d\n", newcell, start_point, start_point+work_size);
             if (new_cell < 0 || new_cell >= work_size) {
-                printf("O MIGUEL E GAYZAO");
+                //printf("O MIGUEL E GAYZAO");
                 continue;
             }
             
