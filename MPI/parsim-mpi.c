@@ -423,19 +423,21 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         // Caso 2: Só um receive está ativo - usa Wait diretamente
         if (incoming_prev_count > 0) {
             MPI_Wait(&recv_requests[0], MPI_STATUS_IGNORE);
+            for (int i= 0;i< incoming_prev_count ; i++){
+                printf("X RECV PREV:  %lf\n", rcv_prev_par[i].x);
+            } 
         }
         if (incoming_next_count > 0) {
             MPI_Wait(&recv_requests[1], MPI_STATUS_IGNORE);
+            for (int i= 0;i< incoming_next_count ; i++){
+                printf("X RECV NEXT %lf\n", rcv_next_par[i].x);
+            }
         }
         
 
-        for (int i= 0;i< incoming_prev_count ; i++){
-            printf("X RECV PREV:  %lf\n", rcv_prev_par[i].x);
-        } 
+        
 
-        for (int i= 0;i< incoming_next_count ; i++){
-            printf("X RECV NEXT %lf\n", rcv_next_par[i].x);
-        }
+        
     }
     
     printf("SAIU");
