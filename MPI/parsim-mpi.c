@@ -406,11 +406,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         MPI_Isend(to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 3, MPI_COMM_WORLD, &send_requests[1]);
         printf("RANK: %d , send next par %lld \n",rank, to_send_next.par[0].id);
     }
-    
-    if (incoming_prev_count > 0 || incoming_next_count > 0) {
-        printf("WAIT");
-        MPI_Waitall(2, recv_requests, statuses);
-    }
 
     if (recv_count > 0) {
         printf("WAIT");
