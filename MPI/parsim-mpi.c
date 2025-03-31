@@ -13,7 +13,7 @@ unsigned int seed;
 long long *work_size; // number of cells that the process computes
 int rank; // id of the process
 int psize; // number of processes
-int start_point=0; // global id of first cell in the process
+int start_point; // global id of first cell in the process
 
 
 MPI_Datatype MPI_CENTER_MASS;
@@ -685,7 +685,7 @@ int main(int argc, char *argv[]){
             }
     }
     printf("Rank %d; worksize 0: %d\n", rank, work_size[0]);
-    
+    start_point=0;
     for (int i=0; i<psize; i++){
         if(i<rank){
             start_point += work_size[i];
