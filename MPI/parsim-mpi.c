@@ -158,15 +158,11 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
         aux.m = rnd01() * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
 
-        printf("Aux x x: %.3f,Aux y Y : %.3f \n", aux.x, aux.y);
-
         double grid_x_aux =  aux.x / cell_size;
         int grid_x = (int)grid_x_aux;
 
         double grid_y_aux = aux.y / cell_size;
         int grid_y = (int)grid_y_aux;
-
-        printf("GRid x: %d,grid Y : %d \n", grid_x, grid_y);
         
         int id_aux = grid_x * ncside + grid_y;
         
@@ -179,8 +175,6 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
             par[local_cell].par[par[local_cell].n_particles].vy = aux.vy;
             par[local_cell].par[par[local_cell].n_particles].m = aux.m;
             par[local_cell].par[par[local_cell].n_particles].alive = 1;
-
-            printf("ID: %d, \n", local_cell);
 
             par[local_cell].n_particles++;
 
