@@ -362,21 +362,23 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     particle_t *rcv_prev_par = NULL;
     particle_t *rcv_next_par = NULL;
 
+    MPI_Request num_send_requests[2], num_recv_requests[2];
+    MPI_Status num_statuses[2];
     MPI_Request send_requests[2], recv_requests[2];
     MPI_Status statuses[2];
 
     int incoming_prev_count = 0, incoming_next_count = 0;
-    MPI_Irecv(&incoming_prev_count, 1, MPI_INT, prev_rank, 1, MPI_COMM_WORLD, &recv_requests[0]);
-    MPI_Irecv(&incoming_next_count, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &recv_requests[1]);
+    MPI_Irecv(&incoming_prev_count, 1, MPI_INT, prev_rank, 1, MPI_COMM_WORLD, &num_recv_requests[0]);
+    MPI_Irecv(&incoming_next_count, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &num_recv_requests[1]);
     //printf("Falhou 1\n");
     int prev_count = to_send_prev.n_particles;
     int next_count = to_send_next.n_particles;
         
-    MPI_Isend(&prev_count, 1, MPI_INT, prev_rank, 0, MPI_COMM_WORLD, &send_requests[0]);
-    MPI_Isend(&next_count, 1, MPI_INT, next_rank, 1, MPI_COMM_WORLD, &send_requests[1]);
+    MPI_Isend(&prev_count, 1, MPI_INT, prev_rank, 0, MPI_COMM_WORLD, &num_send_requests[0]);
+    MPI_Isend(&next_count, 1, MPI_INT, next_rank, 1, MPI_COMM_WORLD, &num_send_requests[1]);
     //printf("Falhou 2\n");
-    MPI_Waitall(2, recv_requests, statuses);
-    MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
+    MPI_Waitall(2, num_recv_requests, num_statuses);
+    MPI_Waitall(2, num_send_requests, MPI_STATUSES_IGNORE);
     // Allocate receive buffers
 
     printf("RANK: %d , Incoming prev: %d,Incoming next: %d,send prev: %d, next send %d \n",rank, incoming_prev_count, incoming_next_count,prev_count,next_count );
@@ -403,6 +405,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     }
     
     if (incoming_prev_count > 0 || incoming_next_count > 0) {
+        printf("WAIT");
         MPI_Waitall(2, recv_requests, statuses);
     }
 
