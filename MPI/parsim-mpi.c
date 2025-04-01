@@ -437,8 +437,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         MPI_Barrier(MPI_COMM_WORLD);
         
     }
-
-    MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
     
     //MPI_Barrier(MPI_COMM_WORLD);
     printf("SAIU");
@@ -527,7 +525,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     }
     
 
-    MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
+    //MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
     
     free(rcv_next_par);
     free(to_send_next.par);
