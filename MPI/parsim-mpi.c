@@ -140,7 +140,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
     for(int i=0; i < work_size[rank]; i++){
         par[i].n_particles = 0;
         par[i].size = n_part/(ncside*ncside);
-        par[i].par = malloc(10000* par[i].size * sizeof(particle_t));
+        par[i].par = malloc(par[i].size * sizeof(particle_t));
         if(par[i].par == NULL) {
             fprintf(stderr, "Memory allocation failed\n");
             MPI_Abort(MPI_COMM_WORLD, 1);
@@ -487,8 +487,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
             if(st_par[new_cell].n_particles >= st_par[new_cell].size){
                 
-                st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
-                st_par[new_cell].size *= 2;
+                //st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
+                //st_par[new_cell].size *= 2;
             }
         }
     }
