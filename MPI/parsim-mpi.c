@@ -331,27 +331,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 //printf("Saiu Celula diferente \n");
             }
 
-            
-            if(x<0){
-                x = space_size;
-                st_par[new_cell].par[st_par[new_cell].n_particles].x += space_size;
-            }
-                
-            
-            if(y<0){
-                y += space_size;
-                st_par[new_cell].par[st_par[new_cell].n_particles].y += space_size;
-            }
-        
-            if(x > space_size){
-                x -= space_size;
-                st_par[new_cell].par[st_par[new_cell].n_particles].x -= space_size;
-            }
-            
-            if(y > space_size){
-                y -= space_size;
-                st_par[new_cell].par[st_par[new_cell].n_particles].y -= space_size;
-            }
         }
         
     }
@@ -448,6 +427,27 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
             y = rcv_prev_par[i].y;
+
+            if(x<0){
+                x = space_size;
+                rcv_prev_par[i].x += space_size;
+            }
+                
+            
+            if(y<0){
+                y += space_size;
+                rcv_prev_par[i].y += space_size;
+            }
+        
+            if(x > space_size){
+                x -= space_size;
+                rcv_prev_par[i].x -= space_size;
+            }
+            
+            if(y > space_size){
+                y -= space_size;
+                rcv_prev_par[i].y -= space_size;
+            }
             
             printf("Rank %d: x:%lf cell_size:%lf \n", rank,x, cell_size);
             printf("Rank %d: y:%lf cell_size:%lf \n", rank,y, cell_size);
@@ -492,6 +492,27 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         for (int i = 0; i < incoming_next_count; i++) {
             x = rcv_next_par[i].x;
             y = rcv_next_par[i].y;
+
+            if(x<0){
+                x = space_size;
+                rcv_next_par[i].x += space_size;
+            }
+                
+            
+            if(y<0){
+                y += space_size;
+                rcv_next_par[i].y += space_size;
+            }
+        
+            if(x > space_size){
+                x -= space_size;
+                rcv_next_par[i].x -= space_size;
+            }
+            
+            if(y > space_size){
+                y -= space_size;
+                rcv_next_par[i].y -= space_size;
+            }
             
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
