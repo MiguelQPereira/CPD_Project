@@ -426,7 +426,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         printf("PREV \n");
         for (int i = 0; i < incoming_prev_count; i++) {
 
-            
+            x = rcv_prev_par[i].x;
+            y = rcv_prev_par[i].y;
 
             if(x<0){
                 printf("X<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_prev_par[i].x);
@@ -493,6 +494,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     if (incoming_next_count > 0) {
         printf("NEXT\n");
         for (int i = 0; i < incoming_next_count; i++) {
+
+            x = rcv_prev_par[i].x;
+            y = rcv_prev_par[i].y;
             
             if(x<0){
                 printf("X<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
