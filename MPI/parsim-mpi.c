@@ -814,6 +814,16 @@ int main(int argc, char *argv[]){
         }
     }
 
+    if (rank == 0) {
+        printf("Total cells: %ld, Cells per process:\n", grid_size*grid_size);
+        for (int i = 0; i < psize; i++) {
+            printf("Process %d: %lld cells\n", i, work_size[i]);
+        }
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("Rank %d: start_point = %d, end_cell = %d\n", 
+           rank, start_point, start_point + work_size[rank] - 1);
+
     
     particles = malloc(work_size[rank] * sizeof(parcell));
     if(particles == NULL) {
