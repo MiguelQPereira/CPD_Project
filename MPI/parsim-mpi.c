@@ -445,7 +445,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     if (next_count > 0 && send_requests[1] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[1], MPI_STATUS_IGNORE);
     }
-    MPI_Barrier(MPI_COMM_WORLD);
+    //MPI_Barrier(MPI_COMM_WORLD);
     printf("SAIU");
     
     
