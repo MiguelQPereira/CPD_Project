@@ -427,7 +427,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     if (prev_count > 0) {
         send_count++;
         for (int i= 0;i<  to_send_prev.n_particles; i++){
-            printf("SEND X PRREV : %lf\n", to_send_prev.par[i].x);
+            //printf("SEND X PRREV : %lf\n", to_send_prev.par[i].x);
         }
         MPI_Isend(to_send_prev.par, prev_count, MPI_PARTICLE_T, prev_rank, 2, MPI_COMM_WORLD, &send_requests[0]);
         //printf("RANK: %d , send pre par %lf \n",rank, to_send_prev.par[0].x);
@@ -436,14 +436,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     if (next_count > 0) {
         send_count++;
         for (int i= 0;i<  to_send_next.n_particles; i++){
-            printf("SEND X NEXT  %lf\n", to_send_next.par[i].x);
+            //printf("SEND X NEXT  %lf\n", to_send_next.par[i].x);
         }
         MPI_Isend(to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 3, MPI_COMM_WORLD, &send_requests[1]);
         //printf("RANK: %d , send next par %d \n",rank, to_send_next.par[0].x);
     }
 
     if (recv_count > 0) {
-        printf("RECV COUNT: %d\n", recv_count);
+        //printf("RECV COUNT: %d\n", recv_count);
         //MPI_Request active_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
         //MPI_Status statuses[2];
 
@@ -451,15 +451,15 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         // Caso 2: Só um receive está ativo - usa Wait diretamente
         if (incoming_prev_count > 0) {
             MPI_Wait(&recv_requests[0], MPI_STATUS_IGNORE);
-            for (int i= 0;i< incoming_prev_count ; i++){
+            /*for (int i= 0;i< incoming_prev_count ; i++){
                 printf("X RECV PREV:  %lf\n", rcv_prev_par[i].x);
-            } 
+            } */
         }
         if (incoming_next_count > 0) {
             MPI_Wait(&recv_requests[1], MPI_STATUS_IGNORE);
-            for (int i= 0;i< incoming_next_count ; i++){
+            /*for (int i= 0;i< incoming_next_count ; i++){
                 printf("X RECV NEXT %lf\n", rcv_next_par[i].x);
-            }
+            }*/
         }
 
         //printf("MORREU\n");
