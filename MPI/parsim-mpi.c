@@ -304,22 +304,37 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
             int num_cel_total = new_cell + start_point;
 
-            if(rank == 0 ){
-                if(new_cell >= new_cell >= work_size[rank]+work_size[rank]){
-                    
-                }
-            }
-
-            if(rank == psize-1){
-                if(new_cell <= -work_size[rank]- work_size[rank]){
-
-                }
-            }
             
             if (new_cell != cell){
                 //printf("Celula diferente \n");
+                
+                if(rank == 0 && new_cell >= new_cell >= work_size[rank]+work_size[rank]){
+                    
+                    to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
+                    to_send_prev.n_particles ++;
+                    
+                    if(to_send_prev.n_particles == to_send_prev.size){
+                        to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
+                        to_send_prev.size *= 2;
+                        
+                    }
+                
+                }
+
+                else if(rank == psize-1 && new_cell <= -work_size[rank]- work_size[rank]){
+                    
+                    to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
+                    to_send_next.n_particles ++;
+                    
+                    if(to_send_next.n_particles == to_send_next.size){
+                        to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
+                        to_send_next.size *= 2;
+                        
+                    }
+                    
+                }
                 //if ((rank == psize -1 && new_cell < 0 && new_cell <= 0 - work_size[rank]) ||(rank != psize-1 && new_cell < 0) || (rank == 0 && new_cell >= work_size[rank]+work_size[rank]))
-                if (new_cell < 0){
+                else if (new_cell < 0){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
                     
