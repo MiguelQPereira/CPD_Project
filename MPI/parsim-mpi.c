@@ -455,10 +455,11 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
             int new_cell = grid_x * grid_size + grid_y;
 
-            printf("Rank %d: start point:%d final_point:%d new_cell = %d , npart %d, size: %d\n", rank,start_point, start_point+work_size, new_cell, st_par[new_cell].n_particles, st_par[new_cell].size);
+            printf("Rank %d: start point:%d final_point:%d new_cell = %d , npart %d, size: %d\n", rank,start_point, (int)start_point+work_size, new_cell, st_par[new_cell].n_particles, st_par[new_cell].size);
 
             
             st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
+            printf("DEPOIS meter part\n");
             st_par[new_cell].n_particles++;
             
             if(st_par[new_cell].n_particles >= st_par[new_cell].size){
