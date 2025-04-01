@@ -273,27 +273,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
             x = st_par[cell].par[id_par].x;
             y = st_par[cell].par[id_par].y;
-
-            if(x<0){
-                x = space_size;
-                st_par[cell].par[id_par].x += space_size;
-            }
-                
-            
-            if(y<0){
-                y += space_size;
-                st_par[cell].par[id_par].y += space_size;
-            }
-        
-            if(x > space_size){
-                x -= space_size;
-                st_par[cell].par[id_par].x -= space_size;
-            }
-            
-            if(y > space_size){
-                y -= space_size;
-                st_par[cell].par[id_par].y -= space_size;
-            }
         
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
@@ -350,6 +329,28 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 
                 st_par[cell].n_particles--;
                 //printf("Saiu Celula diferente \n");
+            }
+
+            
+            if(x<0){
+                x = space_size;
+                st_par[cell].par[id_par].x += space_size;
+            }
+                
+            
+            if(y<0){
+                y += space_size;
+                st_par[cell].par[id_par].y += space_size;
+            }
+        
+            if(x > space_size){
+                x -= space_size;
+                st_par[cell].par[id_par].x -= space_size;
+            }
+            
+            if(y > space_size){
+                y -= space_size;
+                st_par[cell].par[id_par].y -= space_size;
             }
         }
         
