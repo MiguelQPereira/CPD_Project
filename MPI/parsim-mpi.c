@@ -434,7 +434,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
         }
 
-        
+        MPI_Barrier(MPI_COMM_WORLD);
         
     }
 
