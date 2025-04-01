@@ -198,7 +198,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, double cell_size, long grid_size){
     int grid_x;
     int grid_y;
-    printf("Antes Calculo centro de massa, Rank: %d\n", rank);
+    //printf("Antes Calculo centro de massa, Rank: %d\n", rank);
 
     for(int i=start_point; i < start_point+work_size[rank] ;i++){
         
@@ -242,7 +242,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
 
     }
 
-    printf("DEPOIS BROAD \n");
+    //printf("DEPOIS BROAD \n");
     /*
     if (rank == 3){
         for(int i=0; i<grid_size*grid_size; i++)
@@ -411,7 +411,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     MPI_Waitall(2, num_send_requests, MPI_STATUSES_IGNORE);
     // Allocate receive buffers
 
-    printf("RANK: %d , Incoming prev: %d,Incoming next: %d,send prev: %d, next send %d \n",rank, incoming_prev_count, incoming_next_count,prev_count,next_count );
+    //printf("RANK: %d , Incoming prev: %d,Incoming next: %d,send prev: %d, next send %d \n",rank, incoming_prev_count, incoming_next_count,prev_count,next_count );
     if (incoming_prev_count > 0) {
         recv_count++;
         rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
@@ -462,7 +462,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
         }
 
-        printf("MORREU\n");
+        //printf("MORREU\n");
         //MPI_Barrier(MPI_COMM_WORLD);
         
     }
@@ -558,7 +558,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     
     
     // Wait for sends to complete (if any)
-    printf("ANTES WAIT\n");
+    //printf("ANTES WAIT\n");
     if (prev_count > 0 && send_requests[0] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[0], MPI_STATUS_IGNORE);
     }
@@ -805,7 +805,7 @@ int main(int argc, char *argv[]){
                 work_size[i] ++;
             }
     }
-    printf("Rank %d; worksize 0: %d\n", rank, work_size[0]);
+    //printf("Rank %d; worksize 0: %d\n", rank, work_size[0]);
     start_point=0;
     for (int i=0; i<psize; i++){
         if(i<rank){
