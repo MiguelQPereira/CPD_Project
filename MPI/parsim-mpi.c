@@ -466,7 +466,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
         }
 
-        printf("MORREU")
+        printf("MORREU\n");
         MPI_Barrier(MPI_COMM_WORLD);
         
     }
