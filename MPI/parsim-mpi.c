@@ -721,19 +721,20 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         }
         
         //printf("Antes Check colssions , Rank %d:\n", rank);
-        int repeated = 0;
+        //int repeated = 0;
     
         for(int n=0; n<collision_count; n++){
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
             st_par[colision[n].cell].par[colision[n].b].alive = 0;
             for(int m=n+1; m<collision_count; m++){
                 if((colision[n].cell == colision[m].cell) && (colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a)){
-                    repeated++;
-                    continue;
+                    //repeated++;
+                    collision_count--;
+                    //continue;
                 }
             }
         }
-        collision_count -= repeated;
+        //collision_count -= repeated;
 
         MPI_Barrier(MPI_COMM_WORLD);
     }
