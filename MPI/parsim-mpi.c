@@ -366,8 +366,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
     MPI_Request num_send_requests[2], num_recv_requests[2];
     MPI_Status num_statuses[2];
-    MPI_Request send_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
-    MPI_Request recv_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
+    //MPI_Request send_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
+    ///MPI_Request recv_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
 
     int incoming_prev_count = 0, incoming_next_count = 0;
     MPI_Irecv(&incoming_prev_count, 1, MPI_INT, prev_rank, 1, MPI_COMM_WORLD, &num_recv_requests[0]);
@@ -416,8 +416,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
     if (recv_count > 0) {
         printf("RECV COUNT: %d\n", recv_count);
-        MPI_Request active_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
-        MPI_Status statuses[2];
+        //MPI_Request active_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
+        //MPI_Status statuses[2];
 
     
         // Caso 2: Só um receive está ativo - usa Wait diretamente
@@ -433,10 +433,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 printf("X RECV NEXT %lf\n", rcv_next_par[i].x);
             }
         }
-        
 
-        
-
+        MPI_Barrier(MPI_COMM_WORLD);
         
     }
     
