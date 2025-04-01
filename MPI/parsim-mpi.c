@@ -456,14 +456,22 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int new_cell = (grid_x * grid_size + grid_y) -start_point;
 
             printf("Rank %d: start point:%d final_point:%d new_cell = %d , npart %d, size: %d\n", rank,start_point, start_point+work_size[rank], new_cell, st_par[new_cell].n_particles, st_par[new_cell].size);
-
+            if (new_cell < 0 || new_cell >= start_point + work_size[rank]) {
+                printf("Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell);
+                continue;  // Evita acesso inválido
+            }
             
             st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
             printf("DEPOIS meter part\n");
             st_par[new_cell].n_particles++;
             
-            if(st_par[new_cell].n_particles >= st_par[new_cell].size){
-                st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
+            if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
+                particle_t *new_par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
+                if (new_par == NULL) {
+                    printf("Erro no realloc para new_cell %d\n", new_cell);
+                    exit(1);
+                }
+                st_par[new_cell].par = new_par;
                 st_par[new_cell].size *= 2;
             }
         }
@@ -482,7 +490,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
             int new_cell = (grid_x * grid_size + grid_y) -start_point;
 
-            if (new_cell < 0 || new_cell >= grid_size * grid_size) {
+            if (new_cell < 0 || new_cell >= start_point + work_size[rank]) {
                 printf("Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell);
                 continue;  // Evita acesso inválido
             }
