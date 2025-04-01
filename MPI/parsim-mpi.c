@@ -270,10 +270,34 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
     for(int cell = 0; cell < work_size[rank]; cell++){
         for (int id_par=0; id_par < st_par[cell].n_particles; id_par++){
-
-            x = st_par[cell].par[id_par].x;
-            y = st_par[cell].par[id_par].y;
+            particle_t p1 = st_par[cell].par[id_par];
+            //x = st_par[cell].par[id_par].x;
+            //y = st_par[cell].par[id_par].y;
+            
+            if(x<0){
+                printf("X<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
+                p1.x += space_size;
+            }
+                
+            
+            if(y<0){
+                printf("Y<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].y);
+                p1.y += space_size;
+            }
         
+            if(x > space_size){
+                printf("X>Spaces ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
+                p1.x -= space_size;
+            }
+            
+            if(y > space_size){
+                printf("Y>SAPCE,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].y);
+                p1.y -= space_size;
+            }
+
+            x = p1.x;
+            y = p1.x
+            
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
         
@@ -310,7 +334,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
                 }else{
                     //printf("entrou 3");
-                    st_par[new_cell].par[st_par[new_cell].n_particles] = st_par[cell].par[id_par];
+                    st_par[new_cell].par[st_par[new_cell].n_particles] = p1
                     st_par[new_cell].n_particles++;
                     
 
@@ -334,6 +358,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         }
         
     }
+
+    
 
     printf("Inicio Comunicacao , Rank %d:\n", rank);
     int recv_count = 0;
@@ -447,8 +473,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
             
             if(y > space_size){
-                printf("X>Space ,  SPACE: %lf, x: %lf\n ", space_size, rcv_prev_par[i].y);
+                printf("Y>Space ,  SPACE: %lf, x: %lf\n ", space_size, rcv_prev_par[i].y);
                 rcv_prev_par[i].y -= space_size;
+                printf("Y>Space ,  SPACE: %lf, x: %lf\n ", space_size, rcv_prev_par[i].y);
             }
 
             x = rcv_prev_par[i].x;
