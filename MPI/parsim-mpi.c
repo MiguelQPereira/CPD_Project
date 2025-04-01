@@ -446,7 +446,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
             y = rcv_prev_par[i].y;
-
+            
+            printf("Rank %d: start point:%lf final_point:%lf \n", rank,x, cell_size);
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
         
@@ -498,9 +499,13 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_next_par[i];
             st_par[new_cell].n_particles++;
 
-            if(st_par[new_cell].n_particles >= st_par[new_cell].size){
-                
-                st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
+            if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
+                particle_t *new_par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
+                if (new_par == NULL) {
+                    printf("Erro no realloc para new_cell %d\n", new_cell);
+                    exit(1);
+                }
+                st_par[new_cell].par = new_par;
                 st_par[new_cell].size *= 2;
             }
         }
