@@ -765,7 +765,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
 
     if (rank == 0){
         fprintf(stdout, "%d\n", total_collisions);
-        fprintf(stderr, "%.1fs\n", exec_time);
+        fprintf(stdout, "%.1fs\n", exec_time);
     }
 }
 
