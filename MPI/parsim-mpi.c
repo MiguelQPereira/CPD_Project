@@ -561,7 +561,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     
     
     // Wait for sends to complete (if any)
-    
+    /*
     if (prev_count > 0 && send_requests[0] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[0], MPI_STATUS_IGNORE);
     }
@@ -570,7 +570,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         MPI_Wait(&send_requests[1], MPI_STATUS_IGNORE);
     }
     
-
+    */
     //MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
     
     free(rcv_next_par);
