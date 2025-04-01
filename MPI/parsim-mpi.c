@@ -750,7 +750,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     
 }
 
-void print_result(parcell* st_par, int local_collisions){
+void print_result(parcell* st_par, int local_collisions,double exec_time){
 
     int total_collisions;
 
@@ -765,6 +765,7 @@ void print_result(parcell* st_par, int local_collisions){
 
     if (rank == 0){
         fprintf(stdout, "%d\n", total_collisions);
+        fprintf(stderr, "%.1fs\n", exec_time);
     }
 }
 
@@ -828,9 +829,8 @@ int main(int argc, char *argv[]){
     int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
     exec_time += omp_get_wtime();
     
-    print_result(particles, local_colisions);
-    if(rank==0)
-        fprintf(stderr, "%.1fs\n", exec_time);
+    print_result(particles, local_colisions,exec_time);
+        
     
     
     MPI_Finalize();
