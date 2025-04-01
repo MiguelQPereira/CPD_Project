@@ -463,14 +463,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 printf("Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell);
                 continue;  // Evita acesso inválido
             }
-            
-            par[local_cell].par[par[local_cell].n_particles].id = i;
-            par[local_cell].par[par[local_cell].n_particles].x = aux.x; 
-            par[local_cell].par[par[local_cell].n_particles].y = aux.y; 
-            par[local_cell].par[par[local_cell].n_particles].vx = aux.vx; 
-            par[local_cell].par[par[local_cell].n_particles].vy = aux.vy;
-            par[local_cell].par[par[local_cell].n_particles].m = aux.m;
-            par[local_cell].par[par[local_cell].n_particles].alive = 1;
 
             st_par[new_cell].par[st_par[new_cell].n_particles].id = rcv_prev_par[i].id;
             st_par[new_cell].par[st_par[new_cell].n_particles].x = rcv_prev_par[i].x;
