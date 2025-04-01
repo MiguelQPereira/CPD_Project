@@ -453,10 +453,17 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             double grid_y_aux = y / cell_size;
             int grid_y = (int)grid_y_aux;
         
-            int new_cell = grid_x * grid_size + grid_y;
+            int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
-            printf("Rank %d: start point:%d final_point:%d new_cell = %d , npart %d, size: %d\n", rank,start_point, (int)start_point+work_size, new_cell, st_par[new_cell].n_particles, st_par[new_cell].size);
-
+            printf("Rank %d: start point:%d final_point:%d new_cell = %d , npart %d, size: %d\n", rank,start_point, start_point+work_size[rank], new_cell, st_par[new_cell].n_particles, st_par[new_cell].size);
+            /*int local_cell = id_aux - start_point;
+            par[local_cell].par[par[local_cell].n_particles].id = i;
+            par[local_cell].par[par[local_cell].n_particles].x = aux.x; 
+            par[local_cell].par[par[local_cell].n_particles].y = aux.y; 
+            par[local_cell].par[par[local_cell].n_particles].vx = aux.vx; 
+            par[local_cell].par[par[local_cell].n_particles].vy = aux.vy;
+            par[local_cell].par[par[local_cell].n_particles].m = aux.m;
+            par[local_cell].par[par[local_cell].n_particles].alive = 1;*/
             
             st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
             printf("DEPOIS meter part\n");
