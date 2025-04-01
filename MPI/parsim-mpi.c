@@ -314,12 +314,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     if(to_send_prev.n_particles == to_send_prev.size){
                         to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
                         to_send_prev.size *= 2;
-                        
                     }
-                
-                }
-
-                else if(rank == psize-1 && new_cell < -work_size[rank-1]){
+                }else if(rank == psize-1 && new_cell < -work_size[rank-1]){
                     
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
@@ -330,9 +326,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                         
                     }
                     
-                }
-                //if ((rank == psize -1 && new_cell < 0 && new_cell <= 0 - work_size[rank]) ||(rank != psize-1 && new_cell < 0) || (rank == 0 && new_cell >= work_size[rank]+work_size[rank]))
-                else if (new_cell < 0){
+                }else if (new_cell < 0){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
                     
@@ -342,9 +336,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                         
                     }
 
-                }
-                //else if ( (rank == psize -1 && new_cell <= -work_size[rank]- work_size[rank])  ||(rank != psize -1 && new_cell >= work_size[rank]))
-                else if (new_cell >= work_size[rank]){
+                }else if (new_cell >= work_size[rank]){
                 
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
@@ -424,18 +416,18 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     
     if (prev_count > 0) {
         send_count++;
-        for (int i= 0;i<  to_send_prev.n_particles; i++){
-            //if(rank ==0 || rank ==1) printf("RACK: %d SEND X PRREV : %lf\n",rank,  to_send_prev.par[i].x);
-        }
+        /*for (int i= 0;i<  to_send_prev.n_particles; i++){
+            if(rank ==0 || rank ==1) printf("RACK: %d SEND X PRREV : %lf\n",rank,  to_send_prev.par[i].x);
+        }*/
         MPI_Isend(to_send_prev.par, prev_count, MPI_PARTICLE_T, prev_rank, 2, MPI_COMM_WORLD, &send_requests[0]);
         //printf("RANK: %d , send pre par %lf \n",rank, to_send_prev.par[0].x);
     }
     
     if (next_count > 0) {
         send_count++;
-        for (int i= 0;i<  to_send_next.n_particles; i++){
+        /*for (int i= 0;i<  to_send_next.n_particles; i++){
             //if(rank ==0 || rank ==1)printf("RACK %d SEND X NEXT  %lf\n",rank , to_send_next.par[i].x);
-        }
+        }*/
         MPI_Isend(to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 3, MPI_COMM_WORLD, &send_requests[1]);
         //printf("RANK: %d , send next par %d \n",rank, to_send_next.par[0].x);
     }
@@ -714,30 +706,29 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     double distance2 = delta_x * delta_x + delta_y * delta_y;
 
                     if(distance2 <= EPSILON2){
-                        if (collision_count < num_particles) {
-                            colision[collision_count].a = idx_a;
-                            colision[collision_count].b = idx_b;
-                            colision[collision_count].cell = j;
-                            //printf("t = %d Colision: %d %d\n", i, cm[k][w].par_index[idx_a],cm[k][w].par_index[idx_b]);
-                            collision_count++;
-                        }
-                        continue;
+                        colision[collision_count].a = idx_a;
+                        colision[collision_count].b = idx_b;
+                        colision[collision_count].cell = j;
+                        //printf("t = %d Colision: %d %d\n", i, cm[k][w].par_index[idx_a],cm[k][w].par_index[idx_b]);
+                        collision_count++;
                     } 
                 } 
             }                
         }
         
         //printf("Antes Check colssions , Rank %d:\n", rank);
+        int repeated = 0;
     
         for(int n=0; n<collision_count; n++){
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
             st_par[colision[n].cell].par[colision[n].b].alive = 0;
             for(int m=n+1; m<collision_count; m++){
                 if((colision[n].cell == colision[m].cell) && (colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a)){
-                    collision_count--;
+                    repeated++;
                 }
             }
         }
+        collision_count -= repeated;
 
         MPI_Barrier(MPI_COMM_WORLD);
     }
@@ -809,10 +800,8 @@ int main(int argc, char *argv[]){
     }
     //printf("Rank %d; worksize 0: %d\n", rank, work_size[0]);
     start_point=0;
-    for (int i=0; i<psize; i++){
-        if(i<rank){
+    for (int i=0; i<rank; i++){
             start_point += work_size[i];
-        }
     }
     
     particles = malloc(work_size[rank] * sizeof(parcell));
