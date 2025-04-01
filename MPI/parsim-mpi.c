@@ -384,6 +384,11 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     // Allocate receive buffers
 
     printf("RANK: %d , Incoming prev: %d,Incoming next: %d,send prev: %d, next send %d \n",rank, incoming_prev_count, incoming_next_count,prev_count,next_count );
+    if (incoming_prev_count > 0) {
+        rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
+        MPI_Recv(rcv_prev_par, incoming_prev_count, MPI_PARTICLE_T, prev_rank, 3, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    }
+    
     if (incoming_next_count > 0) {
         rcv_next_par = malloc(incoming_next_count * sizeof(particle_t));
         MPI_Recv(rcv_next_par, incoming_next_count, MPI_PARTICLE_T, next_rank, 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
