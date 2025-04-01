@@ -740,6 +740,8 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                 }
             }
         }
+
+        MPI_Barrier(MPI_COMM_WORLD);
     }
     
     //MPI_barrier 
