@@ -302,7 +302,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int grid_y = (int)grid_y_aux;
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
-            int num_cel_total = new_cell + start_point
+            int num_cel_total = new_cell + start_point;
             
             if (new_cell != cell){
                 //printf("Celula diferente \n");
