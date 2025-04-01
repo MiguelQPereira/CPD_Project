@@ -334,23 +334,23 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             
             if(x<0){
                 x = space_size;
-                st_par[cell].par[id_par].x += space_size;
+                st_par[new_cell].par[st_par[new_cell].n_particles].x += space_size;
             }
                 
             
             if(y<0){
                 y += space_size;
-                st_par[cell].par[id_par].y += space_size;
+                st_par[new_cell].par[st_par[new_cell].n_particles].y += space_size;
             }
         
             if(x > space_size){
                 x -= space_size;
-                st_par[cell].par[id_par].x -= space_size;
+                st_par[new_cell].par[st_par[new_cell].n_particles].x -= space_size;
             }
             
             if(y > space_size){
                 y -= space_size;
-                st_par[cell].par[id_par].y -= space_size;
+                st_par[new_cell].par[ist_par[new_cell].n_particles].y -= space_size;
             }
         }
         
