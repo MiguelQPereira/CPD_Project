@@ -447,7 +447,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             x = rcv_prev_par[i].x;
             y = rcv_prev_par[i].y;
             
-            printf("Rank %d: start point:%lf final_point:%lf \n", rank,x, cell_size);
+            printf("Rank %d: x:%lf cell_size:%lf \n", rank,x, cell_size);
+            printf("Rank %d: y:%lf cell_size:%lf \n", rank,y, cell_size);
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
         
