@@ -275,7 +275,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             y = st_par[cell].par[id_par].y;
 
             if(x<0){
-                x = space_size;
+                x += space_size;
                 st_par[cell].par[id_par].x += space_size;
             }
                 
@@ -306,7 +306,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             if (new_cell != cell){
                 //printf("Celula diferente \n");
             
-                if(psize >= 3 && rank == 0 && new_cell >= (work_size[rank])+work_size[rank+1]){
+                if(rank == 0 && new_cell >= (work_size[rank])+work_size[rank+1]){
                     
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
@@ -319,7 +319,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 
                 }
 
-                else if(psize >=3 && rank == psize-1 && new_cell <= -work_size[rank-1]){
+                else if(rank == psize-1 && new_cell < -work_size[rank-1]){
                     
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
