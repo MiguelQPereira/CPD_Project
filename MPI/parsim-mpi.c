@@ -742,6 +742,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         }
     }
     
+    //MPI_barrier 
     //printf("RETURN , Rank %d:\n", rank);
     free(colision);
     return collision_count;
