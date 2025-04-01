@@ -439,7 +439,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     }
     
     printf("SAIU");
-
+    /*
     if (incoming_prev_count > 0) {
         printf("PREV /n");
         for (int i = 0; i < incoming_prev_count; i++) {
@@ -493,7 +493,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         MPI_Status statuses[send_count];
         MPI_Waitall(send_count, send_requests, statuses);
     }
-    
+    */ 
     free(rcv_next_par);
     free(to_send_next.par);
     free(to_send_prev.par);
