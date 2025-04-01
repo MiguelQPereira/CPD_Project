@@ -419,7 +419,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     }
     
     //MPI_Barrier(MPI_COMM_WORLD);
-    printf("SAIU");
+    //printf("SAIU");
     
     
     if (incoming_prev_count > 0) {
@@ -452,8 +452,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             x = rcv_prev_par[i].x;
             y = rcv_prev_par[i].y;
             
-            printf("Rank %d: x:%lf cell_size:%lf \n", rank,x, cell_size);
-            printf("Rank %d: y:%lf cell_size:%lf \n", rank,y, cell_size);
+            //printf("Rank %d: x:%lf cell_size:%lf \n", rank,x, cell_size);
+            //printf("Rank %d: y:%lf cell_size:%lf \n", rank,y, cell_size);
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
         
@@ -476,7 +476,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_prev_par[i].m;
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_prev_par[i].alive;
             //st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
-            printf("DEPOIS meter part\n");
+            //printf("DEPOIS meter part\n");
             st_par[new_cell].n_particles++;
             
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
