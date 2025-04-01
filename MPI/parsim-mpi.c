@@ -434,7 +434,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
         }
 
-        //MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
         
     }
     
@@ -488,14 +488,18 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         }
     }
 
-    /*
+    
     // Wait for sends to complete (if any)
-    if (prev_count > 0 || next_count > 0) {
-        printf("wait 2 2/n");
-        MPI_Status statuses[send_count];
-        MPI_Waitall(send_count, send_requests, statuses);
+    
+    if (prev_count > 0) {
+        MPI_Wait(&send_requests[0], MPI_STATUS_IGNORE);
+        
     }
-    */ 
+    if (next_count > 0) {
+        MPI_Wait(&send_requests[1], MPI_STATUS_IGNORE);
+    }
+    
+    
     free(rcv_next_par);
     free(to_send_next.par);
     free(to_send_prev.par);
