@@ -387,7 +387,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
     }
 
-    printf("Inicio Comunicacao , Rank %d:\n", rank);
+    //printf("Inicio Comunicacao , Rank %d:\n", rank);
     int recv_count = 0;
     int send_count = 0;
     int prev_rank = (rank - 1 + psize) % psize;
@@ -475,13 +475,13 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     
     
     if (incoming_prev_count > 0) {
-        printf("PREV \n");
+        //printf("PREV \n");
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
             y = rcv_prev_par[i].y;
             
-            printf("Rank %d: x:%lf cell_size:%lf \n", rank,x, cell_size);
-            printf("Rank %d: y:%lf cell_size:%lf \n", rank,y, cell_size);
+            //printf("Rank %d: x:%lf cell_size:%lf \n", rank,x, cell_size);
+            //printf("Rank %d: y:%lf cell_size:%lf \n", rank,y, cell_size);
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
         
@@ -504,7 +504,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_prev_par[i].m;
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_prev_par[i].alive;
             //st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
-            printf("DEPOIS meter part\n");
+            //printf("DEPOIS meter part\n");
             st_par[new_cell].n_particles++;
             
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
@@ -519,7 +519,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         }
     }
     if (incoming_next_count > 0) {
-        printf("NEXT\n");
+        //printf("NEXT\n");
         for (int i = 0; i < incoming_next_count; i++) {
             x = rcv_next_par[i].x;
             y = rcv_next_par[i].y;
@@ -597,7 +597,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     for(int t = 0; t < num_timesteps; t++){
         
         calc_center_mass(cells, num_particles, st_par, space_size, grid_size);
-        printf("Antes Wrap , Rank %d:\n", rank);
+        //printf("Antes Wrap , Rank %d:\n", rank);
 
         for(int j=0; j< work_size[rank] ;j++){
 
@@ -703,9 +703,9 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         
         }
 
-        printf("Entrou Cell_calculation , Rank %d:\n", rank);
+        //printf("Entrou Cell_calculation , Rank %d:\n", rank);
         cell_calculation(st_par, grid_size, space_size);
-        printf("Saiu Cell_calculation , Rank %d:\n", rank);
+        //printf("Saiu Cell_calculation , Rank %d:\n", rank);
 
         for(int j=0; j<work_size[rank] ;j++){
 
