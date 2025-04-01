@@ -495,19 +495,23 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         for (int i = 0; i < incoming_next_count; i++) {
             
             if(x<0){
+                printf("X<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
                 rcv_next_par[i].x += space_size;
             }
                 
             
             if(y<0){
+                printf("Y<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].y);
                 rcv_next_par[i].y += space_size;
             }
         
             if(x > space_size){
+                printf("X>Spaces ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
                 rcv_next_par[i].x -= space_size;
             }
             
             if(y > space_size){
+                printf("Y>SAPCE,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].y);
                 rcv_next_par[i].y -= space_size;
             }
             x = rcv_next_par[i].x;
