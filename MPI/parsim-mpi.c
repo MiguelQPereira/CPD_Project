@@ -455,7 +455,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
             int new_cell = grid_x * grid_size + grid_y;
 
-            printf("Rank %d: new_cell = %d (grid_x: %d, grid_y: %d)\n", rank, new_cell, grid_x, grid_y);
+            printf("Rank %d: start point:%d final_point:%d new_cell = %d , npart %d, size: %d\n", rank,start_point, start_point+work_size, new_cell, st_par[new_cell].n_particles, st_par[new_cell].size);
 
             
             st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
