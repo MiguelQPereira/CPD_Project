@@ -467,7 +467,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         }
 
         printf("MORREU\n");
-        MPI_Barrier(MPI_COMM_WORLD);
+        //MPI_Barrier(MPI_COMM_WORLD);
         
     }
     
@@ -562,7 +562,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     
     
     // Wait for sends to complete (if any)
-
+    printf("ANTES WAIT\n");
     if (prev_count > 0 && send_requests[0] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[0], MPI_STATUS_IGNORE);
     }
