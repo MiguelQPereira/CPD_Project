@@ -491,15 +491,13 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     
     // Wait for sends to complete (if any)
     
-    if (prev_count > 0) {
+    if (prev_count > 0 && send_requests[0] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[0], MPI_STATUS_IGNORE);
-        
     }
-    if (next_count > 0) {
+    
+    if (next_count > 0 && send_requests[1] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[1], MPI_STATUS_IGNORE);
     }
-    MPI_Barrier(MPI_COMM_WORLD);
-    
     
     free(rcv_next_par);
     free(to_send_next.par);
