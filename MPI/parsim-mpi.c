@@ -275,28 +275,28 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             //y = st_par[cell].par[id_par].y;
             
             if(x<0){
-                printf("X<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
+                //printf("X<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
                 p1.x += space_size;
             }
                 
             
             if(y<0){
-                printf("Y<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].y);
+                //printf("Y<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].y);
                 p1.y += space_size;
             }
         
             if(x > space_size){
-                printf("X>Spaces ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
+                //printf("X>Spaces ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
                 p1.x -= space_size;
             }
             
             if(y > space_size){
-                printf("Y>SAPCE,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].y);
+                //printf("Y>SAPCE,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].y);
                 p1.y -= space_size;
             }
 
             x = p1.x;
-            y = p1.x
+            y = p1.y;
             
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
