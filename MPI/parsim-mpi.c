@@ -464,7 +464,22 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 continue;  // Evita acesso inválido
             }
             
-            st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
+            par[local_cell].par[par[local_cell].n_particles].id = i;
+            par[local_cell].par[par[local_cell].n_particles].x = aux.x; 
+            par[local_cell].par[par[local_cell].n_particles].y = aux.y; 
+            par[local_cell].par[par[local_cell].n_particles].vx = aux.vx; 
+            par[local_cell].par[par[local_cell].n_particles].vy = aux.vy;
+            par[local_cell].par[par[local_cell].n_particles].m = aux.m;
+            par[local_cell].par[par[local_cell].n_particles].alive = 1;
+
+            st_par[new_cell].par[st_par[new_cell].n_particles].id = rcv_prev_par[i].id;
+            st_par[new_cell].par[st_par[new_cell].n_particles].x = rcv_prev_par[i].x;
+            st_par[new_cell].par[st_par[new_cell].n_particles].y = rcv_prev_par[i].y;
+            st_par[new_cell].par[st_par[new_cell].n_particles].vx = rcv_prev_par[i].vx;
+            st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_prev_par[i].vy;
+            st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_prev_par[i].m;
+            st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_prev_par[i].alive;
+            //st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
             printf("DEPOIS meter part\n");
             st_par[new_cell].n_particles++;
             
@@ -498,7 +513,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 continue;  // Evita acesso inválido
             }
             
-            st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_next_par[i];
+            st_par[new_cell].par[st_par[new_cell].n_particles].id = rcv_next_par[i].id;
+            st_par[new_cell].par[st_par[new_cell].n_particles].x = rcv_next_par[i].x;
+            st_par[new_cell].par[st_par[new_cell].n_particles].y = rcv_next_par[i].y;
+            st_par[new_cell].par[st_par[new_cell].n_particles].vx = rcv_next_par[i].vx;
+            st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_next_par[i].vy;
+            st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_next_par[i].m;
+            st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_next_par[i].alive;
+            //st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_next_par[i];
             st_par[new_cell].n_particles++;
 
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
@@ -515,14 +537,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     
     
     // Wait for sends to complete (if any)
-    /*
+    
     if (prev_count > 0 && send_requests[0] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[0], MPI_STATUS_IGNORE);
     }
     
     if (next_count > 0 && send_requests[1] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[1], MPI_STATUS_IGNORE);
-    }*/
+    }
     
 
     //MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
