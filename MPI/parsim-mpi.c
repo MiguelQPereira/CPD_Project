@@ -274,23 +274,23 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             //x = st_par[cell].par[id_par].x;
             //y = st_par[cell].par[id_par].y;
             
-            if(x<0){
+            if(p1.x<0){
                 //printf("X<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
                 p1.x += space_size;
             }
                 
             
-            if(y<0){
+            if(p1.y<0){
                 //printf("Y<0 ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].y);
                 p1.y += space_size;
             }
         
-            if(x > space_size){
+            if(p1.x > space_size){
                 //printf("X>Spaces ,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].x);
                 p1.x -= space_size;
             }
             
-            if(y > space_size){
+            if(p1.y > space_size){
                 //printf("Y>SAPCE,  SPACE: %lf, x: %lf \n", space_size, rcv_next_par[i].y);
                 p1.y -= space_size;
             }
