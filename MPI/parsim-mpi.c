@@ -686,7 +686,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     px->vy = px->vy + px->ay*DELTAT; //calculate new velocity along y  
                     
                     
-                    printf("Particle %d: mass=%.6f x=.6f y=%.6f vx=%.6f vy=%.6f", k, px->m,px->x, px->y, px->vx, px->vy);
+                    printf("t= %d Particle %d: mass=%.6f x=.6f y=%.6f vx=%.6f vy=%.6f\n", t, k, px->m,px->x, px->y, px->vx, px->vy);
                     //Particle 0: mass=1324.964808 x=0.029175 y=0.014151 vx=0.001617 vy=-0.001198
 
                 }
