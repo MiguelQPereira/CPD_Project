@@ -443,6 +443,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             if(x > space_size){
                 printf("X>SPACE,  SPACE: %lf, x: %lf \n", space_size, rcv_prev_par[i].x);
                 rcv_prev_par[i].x -= space_size;
+                printf("X>SPACE,  SPACE: %lf, x: %lf \n", space_size, rcv_prev_par[i].x);
             }
             
             if(y > space_size){
