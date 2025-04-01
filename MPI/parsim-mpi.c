@@ -434,10 +434,18 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
         }
 
-        MPI_Barrier(MPI_COMM_WORLD);
+        
         
     }
+
+    if (prev_count > 0 && send_requests[0] != MPI_REQUEST_NULL) {
+        MPI_Wait(&send_requests[0], MPI_STATUS_IGNORE);
+    }
     
+    if (next_count > 0 && send_requests[1] != MPI_REQUEST_NULL) {
+        MPI_Wait(&send_requests[1], MPI_STATUS_IGNORE);
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
     printf("SAIU");
     
     
@@ -490,7 +498,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             double grid_y_aux = y / cell_size;
             int grid_y = (int)grid_y_aux;
         
-            int new_cell = (grid_x * grid_size + grid_y) -start_point;
+            int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
             if (new_cell < 0 || new_cell >= work_size[rank]) {
                 printf("Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell);
@@ -516,15 +524,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     // Wait for sends to complete (if any)
     
     
-    if (prev_count > 0 && send_requests[0] != MPI_REQUEST_NULL) {
-        MPI_Wait(&send_requests[0], MPI_STATUS_IGNORE);
-    }
     
-    if (next_count > 0 && send_requests[1] != MPI_REQUEST_NULL) {
-        MPI_Wait(&send_requests[1], MPI_STATUS_IGNORE);
-    }
 
-    //MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
+    MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
     
     free(rcv_next_par);
     free(to_send_next.par);
