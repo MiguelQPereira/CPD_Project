@@ -481,6 +481,11 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int grid_y = (int)grid_y_aux;
         
             int new_cell = (grid_x * grid_size + grid_y) -start_point;
+
+            if (new_cell < 0 || new_cell >= grid_size * grid_size) {
+                printf("Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell);
+                continue;  // Evita acesso inválido
+            }
             
             st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_next_par[i];
             st_par[new_cell].n_particles++;
@@ -496,7 +501,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     
     // Wait for sends to complete (if any)
     
-    /*
+    
     if (prev_count > 0 && send_requests[0] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[0], MPI_STATUS_IGNORE);
     }
@@ -510,7 +515,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     free(rcv_next_par);
     free(to_send_next.par);
     free(to_send_prev.par);
-    free(rcv_prev_par);*/
+    free(rcv_prev_par);
 }
 
 
