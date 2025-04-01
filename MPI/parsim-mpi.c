@@ -439,7 +439,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     }
     
     printf("SAIU");
-    /*
+    
     if (incoming_prev_count > 0) {
         printf("PREV /n");
         for (int i = 0; i < incoming_prev_count; i++) {
@@ -487,6 +487,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
         }
     }
+
+    /*
     // Wait for sends to complete (if any)
     if (prev_count > 0 || next_count > 0) {
         printf("wait 2 2/n");
