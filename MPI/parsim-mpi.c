@@ -839,5 +839,5 @@ int main(int argc, char *argv[]){
     free(cells);
     free(work_size);
 
-    free()
+    //free()
 }
