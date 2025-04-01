@@ -829,7 +829,8 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     
     print_result(particles, local_colisions);
-    fprintf(stderr, "%.1fs\n", exec_time);
+    if(rank==0)
+        fprintf(stderr, "%.1fs\n", exec_time);
     
     
     MPI_Finalize();
