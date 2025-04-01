@@ -453,7 +453,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             double grid_y_aux = y / cell_size;
             int grid_y = (int)grid_y_aux;
         
-            int new_cell = (grid_x * grid_size + grid_y) - start_point;
+            int new_cell = (grid_x * grid_size + grid_y);
 
             printf("Rank %d: start point:%d final_point:%d new_cell = %d , npart %d, size: %d\n", rank,start_point, start_point+work_size[rank], new_cell, st_par[new_cell].n_particles, st_par[new_cell].size);
 
@@ -487,8 +487,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
             if(st_par[new_cell].n_particles >= st_par[new_cell].size){
                 
-                //st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
-                //st_par[new_cell].size *= 2;
+                st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
+                st_par[new_cell].size *= 2;
             }
         }
     }
