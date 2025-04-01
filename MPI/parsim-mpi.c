@@ -448,6 +448,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 y -= space_size;
                 rcv_prev_par[i].y -= space_size;
             }
+
+            x = rcv_prev_par[i].x;
+            y = rcv_prev_par[i].y;
             
             printf("Rank %d: x:%lf cell_size:%lf \n", rank,x, cell_size);
             printf("Rank %d: y:%lf cell_size:%lf \n", rank,y, cell_size);
@@ -490,6 +493,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     if (incoming_next_count > 0) {
         printf("NEXT\n");
         for (int i = 0; i < incoming_next_count; i++) {
+            
             x = rcv_next_par[i].x;
             y = rcv_next_par[i].y;
 
@@ -513,7 +517,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 y -= space_size;
                 rcv_next_par[i].y -= space_size;
             }
-            
+            x = rcv_next_par[i].x;
+            y = rcv_next_par[i].y;
+
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
         
