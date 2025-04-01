@@ -440,9 +440,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     
     printf("SAIU");
     
-    /*
+    
     if (incoming_prev_count > 0) {
-        printf("PREV /n");
+        printf("PREV \n");
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
             y = rcv_prev_par[i].y;
@@ -454,18 +454,21 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int grid_y = (int)grid_y_aux;
         
             int new_cell = grid_x * grid_size + grid_y;
+
+            printf("Rank %d: new_cell = %d (grid_x: %d, grid_y: %d)\n", rank, new_cell, grid_x, grid_y);
+
             
             st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
             st_par[new_cell].n_particles++;
             
-            if(st_par[new_cell].n_particles == st_par[new_cell].size){
+            if(st_par[new_cell].n_particles >= st_par[new_cell].size){
                 st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
                 st_par[new_cell].size *= 2;
             }
         }
     }
     if (incoming_next_count > 0) {
-        printf("NEXT/n");
+        printf("NEXT\n");
         for (int i = 0; i < incoming_next_count; i++) {
             x = rcv_next_par[i].x;
             y = rcv_next_par[i].y;
@@ -481,14 +484,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_next_par[i];
             st_par[new_cell].n_particles++;
 
-            if(st_par[new_cell].n_particles == st_par[new_cell].size){
+            if(st_par[new_cell].n_particles >= st_par[new_cell].size){
                 
                 st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
                 st_par[new_cell].size *= 2;
             }
         }
     }
-    */
+    
     
     // Wait for sends to complete (if any)
     
