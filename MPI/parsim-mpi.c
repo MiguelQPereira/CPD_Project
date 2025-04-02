@@ -347,7 +347,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                         
                     }
 
-                }else{*/
+                }else{
                     //printf("entrou 3");
                     st_par[new_cell].par[st_par[new_cell].n_particles] = st_par[cell].par[id_par];
 
