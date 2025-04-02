@@ -803,7 +803,8 @@ int main(int argc, char *argv[]){
         work_size[i] = aux_size;
         if (i < remain){
                 work_size[i] ++;
-            }
+        }
+        printf("Rank: %d -> worksize: %d\n");
     }
     //printf("Rank %d; worksize 0: %d\n", rank, work_size[0]);
     start_point=0;
