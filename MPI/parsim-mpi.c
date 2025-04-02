@@ -69,7 +69,6 @@ void create_mpi_center_mass_type() {
     MPI_Type_commit(&MPI_CENTER_MASS);
 }
 
-
 void create_mpi_particle_t(){
     MPI_Aint displacements[11];
     int blocklengths[11] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -734,43 +733,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         
         //printf("Antes Check colssions , Rank %d:\n", rank);
         //int repeated = 0;
-
-        // Array to track valid collisions
-        bool *valid = malloc(collision_count * sizeof(bool));
-        for(int n=0; n < collision_count; n++) {
-            valid[n] = true;
-        }
-
-        for(int n=0; n < collision_count; n++) {
-            if (!valid[n]) continue;
-
-            int cell = colision[n].cell;
-            int a = colision[n].a;
-            int b = colision[n].b;
-
-            st_par[cell].par[a].alive = 0;
-            st_par[cell].par[b].alive = 0;
-
-            // Mark duplicates
-            for(int m = n+1; m < collision_count; m++) {
-                if (!valid[m]) continue;
-                if (colision[m].cell == cell && 
-                    (colision[m].a == a || colision[m].a == b || 
-                    colision[m].b == a || colision[m].b == b)) {
-                    valid[m] = false;
-                }
-            }
-        }
-
-        // Count valid collisions
-        int valid_count = 0;
-        for(int n=0; n < collision_count; n++) {
-            if (valid[n]) valid_count++;
-        }
-
-        free(valid);
-        // Use valid_count as needed
-        /*
+        /**/
         for(int n=0; n<collision_count; n++){
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
             st_par[colision[n].cell].par[colision[n].b].alive = 0;
@@ -781,7 +744,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     //continue;
                 }
             }
-        }*/
+        }
         //collision_count -= repeated;
 
         MPI_Barrier(MPI_COMM_WORLD);
@@ -871,7 +834,7 @@ int main(int argc, char *argv[]){
     exec_time = -omp_get_wtime();
     int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
     exec_time += omp_get_wtime();
-    
+    MPI_Barrier(MPI_COMM_WORLD);
     print_result(particles, local_colisions,exec_time);
         
     
@@ -881,6 +844,4 @@ int main(int argc, char *argv[]){
     free(particles);
     free(cells);
     free(work_size);
-
-    //free()
 }
