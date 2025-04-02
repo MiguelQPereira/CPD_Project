@@ -804,7 +804,7 @@ int main(int argc, char *argv[]){
         if (i < remain){
                 work_size[i] ++;
         }
-        printf("Rank: %d -> worksize: %d\n");
+        printf("Rank %d: Process: %d -> worksize: %d\n", rank, i, work_size[i]);
     }
     //printf("Rank %d; worksize 0: %d\n", rank, work_size[0]);
     start_point=0;
