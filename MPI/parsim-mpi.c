@@ -804,13 +804,13 @@ int main(int argc, char *argv[]){
         if (i < remain){
                 work_size[i] ++;
         }
-        printf("Rank %d: Process: %d -> worksize: %d\n", rank, i, work_size[i]);
     }
     //printf("Rank %d; worksize 0: %d\n", rank, work_size[0]);
     start_point=0;
     for (int i=0; i<rank; i++){
-            start_point += work_size[i];
+        start_point += work_size[i];
     }
+    printf("Rank %d: startpoint: %d\n", rank, start_point);
     
     particles = malloc(work_size[rank] * sizeof(parcell));
     if(particles == NULL) {
