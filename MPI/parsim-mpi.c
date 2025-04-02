@@ -685,7 +685,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
     
     MPI_Reduce(&local_collisions, &total_collisions, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    //MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0){
         fprintf(stdout, "%d\n", total_collisions);
         fprintf(stdout, "%.1fs\n", exec_time);
