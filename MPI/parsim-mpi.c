@@ -347,6 +347,23 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
     int recv_count = 0;
     int send_count = 0;
+    int prev_rank = 0;
+    int next_rank = 0;
+
+    if(rank==0){
+        prev_rank = psize -1;
+        next_rank = rank + 1;
+    }
+    else if(rank == psize-1){
+        next_rank = 0;
+        prev_rank = rank -1;
+    }    
+    else{
+        next_rank = rank + 1;
+        prev_rank = rank -1;
+    }
+    
+    
     int prev_rank = (rank - 1 + psize) % psize;
     int next_rank = (rank + 1) % psize;
 
