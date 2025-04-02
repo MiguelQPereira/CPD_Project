@@ -139,7 +139,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
     for(int i=0; i < work_size[rank]; i++){
         par[i].n_particles = 0;
-        par[i].size = n_part/(ncside*ncside);
+        par[i].size = n_part/(ncside*ncside) +1;
         par[i].par = malloc(par[i].size * sizeof(particle_t));
         if(par[i].par == NULL) {
             fprintf(stderr, "Memory allocation failed\n");
@@ -306,7 +306,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             if (new_cell != cell){
                 //printf("Celula diferente \n");
             
-                if(rank == 0 && new_cell >= work_size[rank] + work_size[rank+1]){
+                if(rank == 0 && new_cell >= work_size[0] + work_size[1]){
                     
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
@@ -363,6 +363,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 if (id_par != st_par[cell].n_particles-1){
                     //printf("entrou 4");
                     st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1]; 
+                    id_par--;
 
                 }
                 
@@ -810,7 +811,6 @@ int main(int argc, char *argv[]){
     for (int i=0; i<rank; i++){
         start_point += work_size[i];
     }
-    printf("Rank %d: startpoint: %d\n", rank, start_point);
     
     particles = malloc(work_size[rank] * sizeof(parcell));
     if(particles == NULL) {
