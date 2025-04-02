@@ -349,7 +349,15 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
                 }else{
                     //printf("entrou 3");
-                    st_par[new_cell].par[st_par[new_cell].n_particles] = st_par[cell].par[id_par];
+                    //st_par[new_cell].par[st_par[new_cell].n_particles] = st_par[cell].par[id_par];
+
+                    st_par[new_cell].par[st_par[new_cell].n_particles].id = st_par[cell].par[id_par].id;
+                    st_par[new_cell].par[st_par[new_cell].n_particles].x = st_par[cell].par[id_par].x;
+                    st_par[new_cell].par[st_par[new_cell].n_particles].y = st_par[cell].par[id_par].y;
+                    st_par[new_cell].par[st_par[new_cell].n_particles].vx = st_par[cell].par[id_par].vx;
+                    st_par[new_cell].par[st_par[new_cell].n_particles].vy = st_par[cell].par[id_par].vy;
+                    st_par[new_cell].par[st_par[new_cell].n_particles].m = st_par[cell].par[id_par].m;
+                    st_par[new_cell].par[st_par[new_cell].n_particles].alive = st_par[cell].par[id_par].alive;
                     st_par[new_cell].n_particles++;
                     
 
@@ -362,7 +370,16 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         
                 if (id_par != st_par[cell].n_particles-1){
                     //printf("entrou 4");
-                    st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1]; 
+                    //st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1]; 
+
+                    st_par[cell].par[id_par].id = st_par[cell].par[st_par[cell].n_particles-1].id;
+                    st_par[cell].par[id_par].x = st_par[cell].par[st_par[cell].n_particles-1].x;
+                    st_par[cell].par[id_par].y = st_par[cell].par[st_par[cell].n_particles-1].y;
+                    st_par[cell].par[id_par].vx = st_par[cell].par[st_par[cell].n_particles-1].vx;
+                    st_par[cell].par[id_par].vy = st_par[cell].par[st_par[cell].n_particles-1].vy;
+                    st_par[cell].par[id_par].m = st_par[cell].par[st_par[cell].n_particles-1].m;
+                    st_par[cell].par[id_par].alive = st_par[cell].par[st_par[cell].n_particles-1].alive;
+                    
                     id_par--;
 
                 }
