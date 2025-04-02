@@ -308,7 +308,16 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             
                 if(rank == 0 && new_cell >= work_size[0] + work_size[1]){
                     
-                    to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
+                    //to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
+
+                    to_send_prev.par[to_send_prev.n_particles].id = st_par[cell].par[id_par].id;
+                    to_send_prev.par[to_send_prev.n_particles].x = st_par[cell].par[id_par].x;
+                    to_send_prev.par[to_send_prev.n_particles].y = st_par[cell].par[id_par].y;
+                    to_send_prev.par[to_send_prev.n_particles].vx = st_par[cell].par[id_par].vx;
+                    to_send_prev.par[to_send_prev.n_particles].vy = st_par[cell].par[id_par].vy;
+                    to_send_prev.par[to_send_prev.n_particles].m = st_par[cell].par[id_par].m;
+                    to_send_prev.par[to_send_prev.n_particles].alive = st_par[cell].par[id_par].alive;
+
                     to_send_prev.n_particles ++;
                     
                     if(to_send_prev.n_particles == to_send_prev.size){
@@ -317,7 +326,16 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     }
                 }else if(rank == psize-1 && new_cell < -work_size[rank-1]){
                     
-                    to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
+                    //to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
+
+                    to_send_next.par[to_send_next.n_particles].id = st_par[cell].par[id_par].id;
+                    to_send_next.par[to_send_next.n_particles].x = st_par[cell].par[id_par].x;
+                    to_send_next.par[to_send_next.n_particles].y = st_par[cell].par[id_par].y;
+                    to_send_next.par[to_send_next.n_particles].vx = st_par[cell].par[id_par].vx;
+                    to_send_next.par[to_send_next.n_particles].vy = st_par[cell].par[id_par].vy;
+                    to_send_next.par[to_send_next.n_particles].m = st_par[cell].par[id_par].m;
+                    to_send_next.par[to_send_next.n_particles].alive = st_par[cell].par[id_par].alive;
+
                     to_send_next.n_particles ++;
                     
                     if(to_send_next.n_particles == to_send_next.size){
@@ -327,7 +345,16 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     }
                     
                 }else if (new_cell < 0){
-                    to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
+                    //to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
+
+                    to_send_prev.par[to_send_prev.n_particles].id = st_par[cell].par[id_par].id;
+                    to_send_prev.par[to_send_prev.n_particles].x = st_par[cell].par[id_par].x;
+                    to_send_prev.par[to_send_prev.n_particles].y = st_par[cell].par[id_par].y;
+                    to_send_prev.par[to_send_prev.n_particles].vx = st_par[cell].par[id_par].vx;
+                    to_send_prev.par[to_send_prev.n_particles].vy = st_par[cell].par[id_par].vy;
+                    to_send_prev.par[to_send_prev.n_particles].m = st_par[cell].par[id_par].m;
+                    to_send_prev.par[to_send_prev.n_particles].alive = st_par[cell].par[id_par].alive;
+
                     to_send_prev.n_particles ++;
                     
                     if(to_send_prev.n_particles == to_send_prev.size){
@@ -338,7 +365,16 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
                 }else if (new_cell >= work_size[rank]){
                 
-                    to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
+                    //to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
+
+                    to_send_next.par[to_send_next.n_particles].id = st_par[cell].par[id_par].id;
+                    to_send_next.par[to_send_next.n_particles].x = st_par[cell].par[id_par].x;
+                    to_send_next.par[to_send_next.n_particles].y = st_par[cell].par[id_par].y;
+                    to_send_next.par[to_send_next.n_particles].vx = st_par[cell].par[id_par].vx;
+                    to_send_next.par[to_send_next.n_particles].vy = st_par[cell].par[id_par].vy;
+                    to_send_next.par[to_send_next.n_particles].m = st_par[cell].par[id_par].m;
+                    to_send_next.par[to_send_next.n_particles].alive = st_par[cell].par[id_par].alive;
+
                     to_send_next.n_particles ++;
                     
                     if(to_send_next.n_particles == to_send_next.size){
