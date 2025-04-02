@@ -31,23 +31,18 @@ typedef struct particle_{
     double ay; //particle acceleration along y axis
     double m; //mass of the particle
     int alive; //1 if alive, 0 if evaporated/collided
-    
 }particle_t;
 
 typedef struct parcell_t{
-
     int n_particles;
     particle_t *par;
     int size;
-
 }parcell;
 
 typedef struct cm_{
     double X; //X center of mass
     double Y; //Y of center of mass
     double M; //sum of the mass of each particle
-    //int * par_index;
-    //int n_par;
 }center_mass;
 
 typedef struct {
@@ -148,14 +143,12 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 
     init_r4uni(seed);
 
-    
     for(i = 0; i < n_part; i++) {
 
         aux.x = rnd01() * side;
         aux.y = rnd01() * side;
         aux.vx = (rnd01() - 0.5) * side / ncside / 5.0;
         aux.vy = (rnd01() - 0.5) * side / ncside / 5.0;
-
         aux.m = rnd01() * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
 
         double grid_x_aux =  aux.x / cell_size;
@@ -197,7 +190,6 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, double cell_size, long grid_size){
     int grid_x;
     int grid_y;
-    //printf("Antes Calculo centro de massa, Rank: %d\n", rank);
 
     for(int i=start_point; i < start_point+work_size[rank] ;i++){
         
@@ -230,29 +222,16 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     }
     center_mass* send;
     send = &cm[0];
-    /*if (rank == 3){
-        printf("\nProcesso %d está a mandar o centro de massa da celula %d, massa %.3f\n", rank, start_point, cm[start_point].M);
-    }*/
     int aux_start=0;
     
     for (int i=0; i<psize ; i++){
         MPI_Bcast(&cm[aux_start], work_size[i], MPI_CENTER_MASS, i, MPI_COMM_WORLD);
         aux_start += work_size[i];
 
-    }
-
-    //printf("DEPOIS BROAD \n");
-    /*
-    if (rank == 3){
-        for(int i=0; i<grid_size*grid_size; i++)
-            printf("\nProcesso %d tem %.3f na celula %d\n", rank, cm[i].M, i);
-    }*/
-    
+    }    
 }
 
 void cell_calculation(parcell* st_par, long grid_size, double space_size){
-    
-   
     double cell_size = (double)space_size / grid_size;
     double x;
     double y;
@@ -278,7 +257,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                 st_par[cell].par[id_par].x += space_size;
             }
                 
-            
             if(y<0){
                 y += space_size;
                 st_par[cell].par[id_par].y += space_size;
@@ -303,7 +281,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
             
             if (new_cell != cell){
-                //printf("Celula diferente \n");
             
                 if(rank == 0 && new_cell >= work_size[0] + work_size[1]){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
@@ -320,7 +297,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     if(to_send_next.n_particles == to_send_next.size){
                         to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
                         to_send_next.size *= 2;
-                        
                     }
                     
                 }else if (new_cell < 0){
@@ -330,7 +306,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     if(to_send_prev.n_particles == to_send_prev.size){
                         to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
                         to_send_prev.size *= 2;
-                        
                     }
 
                 }else if (new_cell >= work_size[rank]){
@@ -340,7 +315,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     if(to_send_next.n_particles == to_send_next.size){
                         to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
                         to_send_next.size *= 2;
-                        
                     }
 
                 }else{
@@ -353,22 +327,11 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                     if(st_par[new_cell].n_particles == st_par[new_cell].size){
                         st_par[new_cell].par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
                         st_par[new_cell].size *= 2;
-                        
                     }
                 }
         
                 if (id_par != st_par[cell].n_particles-1){
-                    //printf("entrou 4");
-                    //st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1]; 
-
-                    st_par[cell].par[id_par].id = st_par[cell].par[st_par[cell].n_particles-1].id;
-                    st_par[cell].par[id_par].x = st_par[cell].par[st_par[cell].n_particles-1].x;
-                    st_par[cell].par[id_par].y = st_par[cell].par[st_par[cell].n_particles-1].y;
-                    st_par[cell].par[id_par].vx = st_par[cell].par[st_par[cell].n_particles-1].vx;
-                    st_par[cell].par[id_par].vy = st_par[cell].par[st_par[cell].n_particles-1].vy;
-                    st_par[cell].par[id_par].m = st_par[cell].par[st_par[cell].n_particles-1].m;
-                    st_par[cell].par[id_par].alive = st_par[cell].par[st_par[cell].n_particles-1].alive;
-                    
+                    st_par[cell].par[id_par] = st_par[cell].par[st_par[cell].n_particles-1]; 
                     id_par--;
 
                     if (id_par < -1) {
@@ -376,15 +339,12 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
                         exit(1);
                     }
                 }
-                
                 st_par[cell].n_particles--;
-                //printf("Saiu Celula diferente \n");
             }
         }
         
     }
 
-    //printf("Inicio Comunicacao , Rank %d:\n", rank);
     int recv_count = 0;
     int send_count = 0;
     int prev_rank = (rank - 1 + psize) % psize;
@@ -403,23 +363,20 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     int incoming_prev_count = 0, incoming_next_count = 0;
     MPI_Irecv(&incoming_prev_count, 1, MPI_INT, prev_rank, 1, MPI_COMM_WORLD, &num_recv_requests[0]);
     MPI_Irecv(&incoming_next_count, 1, MPI_INT, next_rank, 0, MPI_COMM_WORLD, &num_recv_requests[1]);
-    //printf("Falhou 1\n");
+
     int prev_count = to_send_prev.n_particles;
     int next_count = to_send_next.n_particles;
         
     MPI_Isend(&prev_count, 1, MPI_INT, prev_rank, 0, MPI_COMM_WORLD, &num_send_requests[0]);
     MPI_Isend(&next_count, 1, MPI_INT, next_rank, 1, MPI_COMM_WORLD, &num_send_requests[1]);
-    //printf("Falhou 2\n");
     MPI_Waitall(2, num_recv_requests, num_statuses);
     MPI_Waitall(2, num_send_requests, MPI_STATUSES_IGNORE);
     // Allocate receive buffers
-
     //printf("RANK: %d , Incoming prev: %d,Incoming next: %d,send prev: %d, next send %d \n",rank, incoming_prev_count, incoming_next_count,prev_count,next_count );
     if (incoming_prev_count > 0) {
         recv_count++;
         rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
         MPI_Irecv(rcv_prev_par, incoming_prev_count, MPI_PARTICLE_T, prev_rank, 0, MPI_COMM_WORLD, &recv_requests[0]);  
-
     }    
     if (incoming_next_count > 0) {
         recv_count++;
@@ -449,39 +406,22 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         //printf("RECV COUNT: %d\n", recv_count);
         //MPI_Request active_requests[2] = {MPI_REQUEST_NULL, MPI_REQUEST_NULL};
         //MPI_Status statuses[2];
-
     
         // Caso 2: Só um receive está ativo - usa Wait diretamente
         if (incoming_prev_count > 0) {
             MPI_Wait(&recv_requests[0], MPI_STATUS_IGNORE);
-            for (int i= 0;i< incoming_prev_count ; i++){
-                //if(rank ==0 || rank ==1)printf("rank %d X RECV PREV:  %lf\n", rank,rcv_prev_par[i].x);
-            } 
         }
         if (incoming_next_count > 0) {
             MPI_Wait(&recv_requests[1], MPI_STATUS_IGNORE);
-            for (int i= 0;i< incoming_next_count ; i++){
-                //if(rank ==0 || rank ==1)printf("Rank: %d X RECV NEXT %lf\n",rank,  rcv_next_par[i].x);
-            }
         }
 
-        //printf("MORREU\n");
-        //MPI_Barrier(MPI_COMM_WORLD);
-        
     }
-    
-    //MPI_Barrier(MPI_COMM_WORLD);
-    //printf("SAIU");
-    
-    
-    if (incoming_prev_count > 0) {
-        //printf("PREV \n");
+
+    if (incoming_prev_count > 0){
         for (int i = 0; i < incoming_prev_count; i++) {
             x = rcv_prev_par[i].x;
             y = rcv_prev_par[i].y;
             
-            //printf("Rank %d: x:%lf cell_size:%lf \n", rank,x, cell_size);
-            //printf("Rank %d: y:%lf cell_size:%lf \n", rank,y, cell_size);
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
         
@@ -503,8 +443,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_prev_par[i].vy;
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_prev_par[i].m;
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_prev_par[i].alive;
-            //st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_prev_par[i];
-            //printf("DEPOIS meter part\n");
+            
             st_par[new_cell].n_particles++;
             
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
@@ -519,7 +458,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         }
     }
     if (incoming_next_count > 0) {
-        //printf("NEXT\n");
         for (int i = 0; i < incoming_next_count; i++) {
             x = rcv_next_par[i].x;
             y = rcv_next_par[i].y;
@@ -558,10 +496,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             }
         }
     }
-    
-    
     // Wait for sends to complete (if any)
-    //printf("ANTES WAIT\n");
     if (prev_count > 0 && send_requests[0] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[0], MPI_STATUS_IGNORE);
     }
@@ -569,9 +504,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     if (next_count > 0 && send_requests[1] != MPI_REQUEST_NULL) {
         MPI_Wait(&send_requests[1], MPI_STATUS_IGNORE);
     }
-    
-    
-    //MPI_Waitall(2, send_requests, MPI_STATUSES_IGNORE);
     
     free(rcv_next_par);
     free(to_send_next.par);
@@ -593,11 +525,9 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     //ParColision colision[num_particles];
     particle_t *px,*py;
 
-    
     for(int t = 0; t < num_timesteps; t++){
         
         calc_center_mass(cells, num_particles, st_par, space_size, grid_size);
-        //printf("Antes Wrap , Rank %d:\n", rank);
 
         for(int j=0; j< work_size[rank] ;j++){
 
@@ -665,7 +595,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                             }else{
                                 x_aux = cells[cellad_x*grid_size + cellad_y].X;
                             }
-                            
 
                             if(cell_y - cellad_y < -1){
                                 y_aux = cells[cellad_x*grid_size + cellad_y].Y - space_size;
@@ -678,7 +607,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                             delta_x = x_aux - px->x;
                             delta_y = y_aux - px->y;
 
-
                             double distance2_cm = delta_x * delta_x + delta_y * delta_y;  // r^2
                             double distance_cm = sqrt(distance2_cm);
                             double distance3_cm = distance2_cm * distance_cm;
@@ -687,7 +615,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
                             px->Fx += force * delta_x;
                             px->Fy += force * delta_y;
-                            
                         } 
                     } 
 
@@ -696,21 +623,15 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     px->x = px->x + px->vx*DELTAT + 0.5*px->ax*DELTAT*DELTAT; //calculate new position x
                     px->y = px->y + px->vy*DELTAT + 0.5*px->ay*DELTAT*DELTAT; //calculate new position y
                     px->vx = px->vx + px->ax*DELTAT; //calculate new velocity along x
-                    px->vy = px->vy + px->ay*DELTAT; //calculate new velocity along y  
-                    
+                    px->vy = px->vy + px->ay*DELTAT; //calculate new velocity along y
                     
                     //printf("t= %d Particle %d: mass=%.6f x=%.6f y=%.6f vx=%.6f vy=%.6f\n", t, px->id, px->m,px->x, px->y, px->vx, px->vy);
                     //Particle 0: mass=1324.964808 x=0.029175 y=0.014151 vx=0.001617 vy=-0.001198
-
                 }
             }
-        
         }
 
-        //printf("Entrou Cell_calculation , Rank %d:\n", rank);
         cell_calculation(st_par, grid_size, space_size);
-        MPI_Barrier(MPI_COMM_WORLD);
-        //printf("Saiu Cell_calculation , Rank %d:\n", rank);
 
         for(int j=0; j<work_size[rank] ;j++){
 
@@ -734,31 +655,21 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
             }                
         }
         
-        //printf("Antes Check colssions , Rank %d:\n", rank);
-        //int repeated = 0;
-        /**/
         for(int n=0; n<collision_count; n++){
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
             st_par[colision[n].cell].par[colision[n].b].alive = 0;
             for(int m=n+1; m<collision_count; m++){
                 if((colision[n].cell == colision[m].cell) && (colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a)){
-                    //repeated++;
                     collision_count--;
-                    //continue;
                 }
             }
         }
-        //collision_count -= repeated;
 
         MPI_Barrier(MPI_COMM_WORLD);
     }
     
-    //MPI_barrier 
-    //printf("RETURN , Rank %d:\n", rank);
     free(colision);
     return collision_count;
-    
-    
 }
 
 void print_result(parcell* st_par, int local_collisions,double exec_time){
@@ -816,10 +727,10 @@ int main(int argc, char *argv[]){
     for (int i=0; i < psize; i++){
         work_size[i] = aux_size;
         if (i < remain){
-                work_size[i] ++;
+            work_size[i] ++;
         }
     }
-    //printf("Rank %d; worksize 0: %d\n", rank, work_size[0]);
+
     start_point=0;
     for (int i=0; i<rank; i++){
         start_point += work_size[i];
@@ -840,8 +751,6 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     print_result(particles, local_colisions,exec_time);
         
-    
-    
     MPI_Finalize();
 
     free(particles);
