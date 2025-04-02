@@ -347,6 +347,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
 
     int recv_count = 0;
     int send_count = 0;
+
     int prev_rank = 0;
     int next_rank = 0;
 
@@ -364,8 +365,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     }
     
     
-    int prev_rank = (rank - 1 + psize) % psize;
-    int next_rank = (rank + 1) % psize;
+    //int prev_rank = (rank - 1 + psize) % psize;
+    //int next_rank = (rank + 1) % psize;
 
     particle_t *rcv_prev_par = NULL;
     particle_t *rcv_next_par = NULL;
