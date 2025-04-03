@@ -301,7 +301,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             
             if (new_cell != cell){
             
-                if(rank == 0 && (new_cell < (grid_size* grid_size - work_size[prev_rank]) || new_cell >= (grid_size* grid_size))){
+                if(rank == 0 && (new_cell >= (grid_size* grid_size - work_size[prev_rank]) || new_cell < (grid_size* grid_size))){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
 
