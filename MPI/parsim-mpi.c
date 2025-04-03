@@ -755,8 +755,6 @@ int main(int argc, char *argv[]){
     for (int i=0; i<rank; i++){
         start_point += work_size[i];
     }
-
-    printf("Rank: %d ; startpoint: %d", rank, start_point);
     
     particles = malloc(work_size[rank] * sizeof(parcell));
     if(particles == NULL) {
