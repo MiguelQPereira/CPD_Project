@@ -346,7 +346,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                         aux += work_size[h];
                     }
                     //if (/*new_cell+start_point < aux )||*/ new_cell >= start_point)
-                        //printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
+                        //printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_r    ank, new_cell);
                     
                     if(to_send_prev.n_particles == to_send_prev.size){
                         to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
@@ -652,6 +652,8 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
                             delta_x = x_aux - px->x;
                             delta_y = y_aux - px->y;
+                            if(delta_x > space_size/grid_size *2 || -delta_x > space_size/grid_size *2 || delta_y > space_size/grid_size *2 || -delta_y > space_size/grid_size *2)
+                                printf("CENTRO DE MASSA MAL CALCULADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
                             double distance2_cm = delta_x * delta_x + delta_y * delta_y;  // r^2
                             double distance_cm = sqrt(distance2_cm);
