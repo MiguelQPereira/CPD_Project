@@ -308,7 +308,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                         to_send_prev.size *= 2;
                     }
 
-                }else if (new_cell >= work_size[rank]){
+                }else if (new_cell > work_size[rank]){
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
                     
@@ -408,18 +408,25 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             if(rank ==0 || rank ==1) printf("RACK: %d SEND X PRREV : %lf\n",rank,  to_send_prev.par[i].x);
         }*/
        for(int g=0; g<prev_count; g++){
+        /*double grid_x_aux = x / cell_size;
+        int grid_x = (int)grid_x_aux;
+    
+        double grid_y_aux = y / cell_size;
+        int grid_y = (int)grid_y_aux;
+    
+        int new_cell = (grid_x * grid_size + grid_y) - start_point;
             printf("t=%d Sending... Rank: %d to rank: %d particle with coordenates: %.3f ; %.3f \n", t, rank, prev_rank, to_send_prev.par[g].x, to_send_prev.par[g].y);
        }
-       
+       */
         MPI_Isend(to_send_prev.par, prev_count, MPI_PARTICLE_T, prev_rank, 3, MPI_COMM_WORLD, &send_requests[0]);
         //printf("RANK: %d , send pre par %lf \n",rank, to_send_prev.par[0].x);
     }
     
     if (next_count > 0) {
         send_count++;
-        for(int g=0; g<prev_count; g++){
+        /*for(int g=0; g<prev_count; g++){
             printf("t=%d Sending... Rank: %d to rank: %d particle with coordenates: %.3f ; %.3f\n ", t, rank, next_rank, to_send_next.par[g].x, to_send_next.par[g].y);
-       }
+       }*/
         MPI_Isend(to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 2, MPI_COMM_WORLD, &send_requests[1]);
         //printf("RANK: %d , send next par %d \n",rank, to_send_next.par[0].x);
     }
