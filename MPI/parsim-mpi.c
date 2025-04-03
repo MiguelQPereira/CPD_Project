@@ -187,7 +187,7 @@ void init_particles(long seed, double side, long ncside, long long n_part, parce
 }
 
 
-void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, double cell_size, long grid_size){
+void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, long grid_size){
     int grid_x;
     int grid_y;
 
@@ -574,7 +574,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
     for(int t = 0; t < num_timesteps; t++){
         
-        calc_center_mass(cells, num_particles, st_par, cell_size, grid_size);
+        calc_center_mass(cells, num_particles, st_par, grid_size);
 
         for(int j=0; j< work_size[rank] ;j++){
 
@@ -674,8 +674,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     
                     //printf("t= %d Particle %d: mass=%.6f x=%.6f y=%.6f vx=%.6f vy=%.6f\n", t, px->id, px->m,px->x, px->y, px->vx, px->vy);
                     //Particle 0: mass=1324.964808 x=0.029175 y=0.014151 vx=0.001617 vy=-0.001198
-                    if(st_par[j].par[k].id==2621)
-                    printf("Fx: %.14f \n Fy: %.14f alive: %d\n\n", (int) (px->x/((double)(space_size/grid_size))), (int) (px->y/((double)(space_size/grid_size))), px->alive);
+                    
                 }
             }
         }
