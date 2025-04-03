@@ -674,12 +674,14 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     
                     //printf("t= %d Particle %d: mass=%.6f x=%.6f y=%.6f vx=%.6f vy=%.6f\n", t, px->id, px->m,px->x, px->y, px->vx, px->vy);
                     //Particle 0: mass=1324.964808 x=0.029175 y=0.014151 vx=0.001617 vy=-0.001198
-                    
+                    if(t==2189 && st_par[j].par[k].id == 2621){
+                        printf("SIMULATION - t=%d | id=%d | x = %.3f | y = %.3f | cell = %d\n", t, st_par[j].par[k].id, st_par[j].par[k].x, st_par[j].par[k].y, j);
+                    }
                 }
             }
         }
 
-
+        
         cell_calculation(st_par, grid_size, space_size, t);
 
         for(int j=0; j<work_size[rank] ;j++){
