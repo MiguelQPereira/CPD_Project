@@ -246,6 +246,25 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
     to_send_prev.size = work_size[rank];
     to_send_prev.n_particles = 0;
 
+    int recv_count = 0;
+    int send_count = 0;
+
+    int prev_rank = 0;
+    int next_rank = 0;
+
+    if(rank==0){
+        prev_rank = psize -1;
+        next_rank = rank + 1;
+    }
+    else if(rank == psize-1){
+        next_rank = 0;
+        prev_rank = rank -1;
+    }    
+    else{
+        next_rank = rank + 1;
+        prev_rank = rank -1;
+    }
+
     for(int cell = 0; cell < work_size[rank]; cell++){
         for (int id_par=0; id_par < st_par[cell].n_particles; id_par++){
 
@@ -285,6 +304,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                 if(rank == 0 && new_cell >= work_size[0] + work_size[1]){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
+
+                    int aux;
+                    for (int h=0; h<prev_rank; h++){
+                        aux += work_size[h];
+                    }
+                    if (new_cell < aux && new_cell >= aux + work_size[prev_rank])
+                        printf("t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
+                    
                     
                     if(to_send_prev.n_particles == to_send_prev.size){
                         to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
@@ -293,6 +320,13 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                 }else if(rank == psize-1 && new_cell < -work_size[rank-1]){
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
+
+                    int aux;
+                    for (int h=0; h<next_rank; h++){
+                        aux += work_size[h];
+                    }
+                    if (new_cell < aux && new_cell >= aux + work_size[next_rank])
+                        printf("t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, next_rank, new_cell);
                     
                     if(to_send_next.n_particles == to_send_next.size){
                         to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
@@ -302,15 +336,29 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                 }else if (new_cell < 0){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
+
+                    int aux;
+                    for (int h=0; h<prev_rank; h++){
+                        aux += work_size[h];
+                    }
+                    if (new_cell < aux && new_cell >= aux + work_size[prev_rank])
+                        printf("t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
                     
                     if(to_send_prev.n_particles == to_send_prev.size){
                         to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
                         to_send_prev.size *= 2;
                     }
 
-                }else if (new_cell > work_size[rank]){
+                }else if (new_cell >= work_size[rank]){
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
+
+                    int aux;
+                    for (int h=0; h<next_rank; h++){
+                        aux += work_size[h];
+                    }
+                    if (new_cell < aux && new_cell >= aux + work_size[next_rank])
+                        printf("t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, next_rank, new_cell);
                     
                     if(to_send_next.n_particles == to_send_next.size){
                         to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
@@ -345,24 +393,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         
     }
 
-    int recv_count = 0;
-    int send_count = 0;
-
-    int prev_rank = 0;
-    int next_rank = 0;
-
-    if(rank==0){
-        prev_rank = psize -1;
-        next_rank = rank + 1;
-    }
-    else if(rank == psize-1){
-        next_rank = 0;
-        prev_rank = rank -1;
-    }    
-    else{
-        next_rank = rank + 1;
-        prev_rank = rank -1;
-    }
+    
     
     
     //int prev_rank = (rank - 1 + psize) % psize;
@@ -404,29 +435,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
     
     if (prev_count > 0) {
         send_count++;
-        /*for (int i= 0;i<  to_send_prev.n_particles; i++){
-            if(rank ==0 || rank ==1) printf("RACK: %d SEND X PRREV : %lf\n",rank,  to_send_prev.par[i].x);
-        }*/
-       /*for(int g=0; g<prev_count; g++){
-        double grid_x_aux = x / cell_size;
-        int grid_x = (int)grid_x_aux;
-    
-        double grid_y_aux = y / cell_size;
-        int grid_y = (int)grid_y_aux;
-    
-        int new_cell = (grid_x * grid_size + grid_y) - start_point;
-            printf("t=%d Sending... Rank: %d to rank: %d particle with coordenates: %.3f ; %.3f \n", t, rank, prev_rank, to_send_prev.par[g].x, to_send_prev.par[g].y);
-       }
-       */
+        
         MPI_Isend(to_send_prev.par, prev_count, MPI_PARTICLE_T, prev_rank, 3, MPI_COMM_WORLD, &send_requests[0]);
         //printf("RANK: %d , send pre par %lf \n",rank, to_send_prev.par[0].x);
     }
     
     if (next_count > 0) {
         send_count++;
-        /*for(int g=0; g<prev_count; g++){
-            printf("t=%d Sending... Rank: %d to rank: %d particle with coordenates: %.3f ; %.3f\n ", t, rank, next_rank, to_send_next.par[g].x, to_send_next.par[g].y);
-       }*/
+        
         MPI_Isend(to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 2, MPI_COMM_WORLD, &send_requests[1]);
         //printf("RANK: %d , send next par %d \n",rank, to_send_next.par[0].x);
     }
