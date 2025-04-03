@@ -317,7 +317,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                         to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
                         to_send_prev.size *= 2;
                     }
-                }else if(rank == psize-1 && new_cell < -work_size[rank-1]){
+                }else if(rank == psize-1 &&  new_cell + start_point >= 0 && new_cell + start_point < work_size[0]/*new_cell < -work_size[rank-1]*/){
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
 
