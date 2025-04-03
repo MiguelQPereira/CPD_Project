@@ -562,6 +562,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
     double delta_x = 0, delta_y = 0; //displacement of the particle in x and y
     int collision_count = 0; //count collisions
+    double cell_size = (double)space_size / grid_size;
     //double cell_size = (double)space_size / grid_size;
     ParColision *colision = malloc(num_particles * sizeof(ParColision));
     if(colision == NULL) {
@@ -573,7 +574,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
     for(int t = 0; t < num_timesteps; t++){
         
-        calc_center_mass(cells, num_particles, st_par, space_size, grid_size);
+        calc_center_mass(cells, num_particles, st_par, cell_size, grid_size);
 
         for(int j=0; j< work_size[rank] ;j++){
 
