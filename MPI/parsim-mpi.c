@@ -312,7 +312,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     }
                     
                     if(new_cell + start_point < aux || new_cell >= aux + work_size[psize-1])
-                        printf("--t=%d Rank:%d sending to rank %d particle in cell: %d, particle id: %d\n", t, rank, prev_rank, new_cell, st_par[cell].par[id_par].id);
+                        printf("--t=%d Rank:%d sending to rank %d particle in cell: %d, particle id: %d; x: %.3f y: %.3f\n", t, rank, prev_rank, new_cell, st_par[cell].par[id_par].id, st_par[cell].par[id_par].x, st_par[cell].par[id_par].y);
                     //if (/*new_cell < aux ||*/ new_cell >= start_point)
                         //printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
                     
