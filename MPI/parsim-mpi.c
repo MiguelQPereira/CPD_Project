@@ -305,13 +305,13 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
 
-                    int aux;
+                    int aux=0;
                     
                     for (int h=0; h<prev_rank; h++){
                         aux += work_size[h];
                     }
                     
-                    if(new_cell < aux || new_cell >= aux + work_size[prev_rank])
+                    if(new_cell + start_point < aux || new_cell >= aux + work_size[psize-1])
                         printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
                     //if (/*new_cell < aux ||*/ new_cell >= start_point)
                         //printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
@@ -325,7 +325,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
 
-                    int aux;
+                    int aux=0;
                     for (int h=0; h<next_rank; h++){
                         aux += work_size[h];
                     }
@@ -341,7 +341,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
 
-                    int aux;
+                    int aux=0;
                     for (int h=0; h<prev_rank; h++){
                         aux += work_size[h];
                     }
@@ -357,7 +357,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
 
-                    int aux;
+                    int aux=0;
                     for (int h=0; h<next_rank; h++){
                         aux += work_size[h];
                     }
