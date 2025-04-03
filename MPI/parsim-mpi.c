@@ -747,7 +747,11 @@ int main(int argc, char *argv[]){
         if (i < remain){
             work_size[i] ++;
         }
+
+        printf("Rank: %d ; worksize: %d\n", rank, work_size[i]);
     }
+
+
 
     start_point=0;
     for (int i=0; i<rank; i++){
