@@ -311,9 +311,10 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                         aux += work_size[h];
                     }
                     
+                    //if(new_cell + aux < aux || new_cell >= aux + work_size[prev_rank])
                 
-                    if (/*new_cell < aux ||*/ new_cell >= start_point)
-                        printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
+                    //if (/*new_cell < aux ||*/ new_cell >= start_point)
+                        //printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
                     
                     
                     if(to_send_prev.n_particles == to_send_prev.size){
@@ -328,8 +329,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     for (int h=0; h<next_rank; h++){
                         aux += work_size[h];
                     }
-                    if (/*new_cell + start_point < aux )||*/ new_cell >= work_size[rank])
-                        printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, next_rank, new_cell);
+                    //if (/*new_cell + start_point < aux )||*/ new_cell >= work_size[rank])
+                       // printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, next_rank, new_cell);
                     
                     if(to_send_next.n_particles == to_send_next.size){
                         to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
@@ -344,8 +345,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     for (int h=0; h<prev_rank; h++){
                         aux += work_size[h];
                     }
-                    if (/*new_cell+start_point < aux )||*/ new_cell >= start_point)
-                        printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
+                    //if (/*new_cell+start_point < aux )||*/ new_cell >= start_point)
+                        //printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
                     
                     if(to_send_prev.n_particles == to_send_prev.size){
                         to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
@@ -360,8 +361,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     for (int h=0; h<next_rank; h++){
                         aux += work_size[h];
                     }
-                    if (/*new_cell+start_point < aux )||*/ new_cell >= work_size[rank])
-                        printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, next_rank, new_cell);
+                    //if (/*new_cell+start_point < aux )||*/ new_cell >= work_size)
+                        //printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, next_rank, new_cell);
                     
                     if(to_send_next.n_particles == to_send_next.size){
                         to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
