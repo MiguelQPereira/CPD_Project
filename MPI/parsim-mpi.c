@@ -664,9 +664,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                         } 
                     } 
 
-                    int prevx=px->x;
-                    int prevy=px->y;
-
                     px->ax = px->Fx/px->m; 
                     px->ay = px->Fy/px->m;
                     px->x = px->x + px->vx*DELTAT + 0.5*px->ax*DELTAT*DELTAT; //calculate new position x
@@ -677,7 +674,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     //printf("t= %d Particle %d: mass=%.6f x=%.6f y=%.6f vx=%.6f vy=%.6f\n", t, px->id, px->m,px->x, px->y, px->vx, px->vy);
                     //Particle 0: mass=1324.964808 x=0.029175 y=0.014151 vx=0.001617 vy=-0.001198
                     if(st_par[j].par[k].id==2621)
-                    printf("Fx: %.3f \n Fy: %.3f alive: %d\n\n", px->Fx, px->Fy, px->alive);
+                    printf("Fx: %.3f \n Fy: %.3f alive: %d\n\n", px->x, px->y, px->alive);
                 }
             }
         }
