@@ -293,7 +293,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
-            printf("%d", grid_x);
+            printf("%d\n", grid_x);
         
             double grid_y_aux = y / cell_size;
             int grid_y = (int)grid_y_aux;
