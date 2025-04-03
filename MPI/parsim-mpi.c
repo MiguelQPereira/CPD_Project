@@ -231,7 +231,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, d
     }    
 }
 
-void cell_calculation(parcell* st_par, long grid_size, double space_size){
+void cell_calculation(parcell* st_par, long grid_size, double space_size, int t){
     double cell_size = (double)space_size / grid_size;
     double x;
     double y;
@@ -489,7 +489,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
             if (new_cell < 0 || new_cell >= work_size[rank]) {
-                printf("Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
+                printf("t=%d; Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", t, rank, new_cell+start_point);
                 continue;  // Evita acesso inválido
             }
             
@@ -649,7 +649,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
             }
         }
 
-        cell_calculation(st_par, grid_size, space_size);
+        cell_calculation(st_par, grid_size, space_size, t);
 
         for(int j=0; j<work_size[rank] ;j++){
 
