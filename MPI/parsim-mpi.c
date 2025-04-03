@@ -407,8 +407,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         /*for (int i= 0;i<  to_send_prev.n_particles; i++){
             if(rank ==0 || rank ==1) printf("RACK: %d SEND X PRREV : %lf\n",rank,  to_send_prev.par[i].x);
         }*/
-       for(int g=0; g<prev_count; g++){
-        /*double grid_x_aux = x / cell_size;
+       /*for(int g=0; g<prev_count; g++){
+        double grid_x_aux = x / cell_size;
         int grid_x = (int)grid_x_aux;
     
         double grid_y_aux = y / cell_size;
