@@ -306,7 +306,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_prev.n_particles ++;
                     
                     int aux=0;
-                    for (int h=0; h<next_rank; h++){
+                    for (int h=0; h<prev_rank; h++){
                         aux += work_size[h];
                     }
                     //printf("work_size=%d Rank:%d AUx %d New_cell %d\n", work_size[prev_rank], rank, aux, new_cell);
