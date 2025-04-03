@@ -301,16 +301,17 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             
             if (new_cell != cell){
             
-                if(rank == 0 && (new_cell >= (grid_size* grid_size - work_size[prev_rank]) && new_cell < (grid_size* grid_size))){
+                if(rank == 0 && new_cell >= work_size[0] + work_size[1]){
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
+
+                    int aux;
                     
-                    int aux=0;
                     for (int h=0; h<prev_rank; h++){
                         aux += work_size[h];
                     }
-                    //printf("work_size=%d Rank:%d AUx %d New_cell %d\n", work_size[prev_rank], rank, aux, new_cell);
-                    if(new_cell < -work_size[prev_rank] || new_cell >= 0)
+                    
+                    if(new_cell < aux || new_cell >= aux + work_size[prev_rank])
                         printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
                     //if (/*new_cell < aux ||*/ new_cell >= start_point)
                         //printf("--t=%d Rank:%d sending to rank %d particle in cell: %d\n", t, rank, prev_rank, new_cell);
@@ -320,11 +321,11 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                         to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
                         to_send_prev.size *= 2;
                     }
-                }else if(rank == psize-1 &&  new_cell + start_point >= 0 && new_cell + start_point < work_size[0]/*new_cell < -work_size[rank-1]*/){
+                }else if(rank == psize-1 && new_cell < -work_size[rank-1]){
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
 
-                    int aux=0;
+                    int aux;
                     for (int h=0; h<next_rank; h++){
                         aux += work_size[h];
                     }
@@ -340,7 +341,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_prev.par[to_send_prev.n_particles] = st_par[cell].par[id_par];
                     to_send_prev.n_particles ++;
 
-                    int aux=0;
+                    int aux;
                     for (int h=0; h<prev_rank; h++){
                         aux += work_size[h];
                     }
@@ -356,7 +357,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next.n_particles ++;
 
-                    int aux=0;
+                    int aux;
                     for (int h=0; h<next_rank; h++){
                         aux += work_size[h];
                     }
