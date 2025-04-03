@@ -293,6 +293,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         
             double grid_x_aux = x / cell_size;
             int grid_x = (int)grid_x_aux;
+            printf("%d", grid_x);
         
             double grid_y_aux = y / cell_size;
             int grid_y = (int)grid_y_aux;
@@ -673,9 +674,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     px->y = px->y + px->vy*DELTAT + 0.5*px->ay*DELTAT*DELTAT; //calculate new position y
                     px->vx = px->vx + px->ax*DELTAT; //calculate new velocity along x
                     px->vy = px->vy + px->ay*DELTAT; //calculate new velocity along y
-
-                    if(prevx-px->x > space_size/grid_size*2 || -prevx-px->x > space_size/grid_size*2 || prevy-px->y > space_size/grid_size*2 || -prevy-py->x > space_size/grid_size*2)
-                        printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1!!!!!\n");
                     
                     //printf("t= %d Particle %d: mass=%.6f x=%.6f y=%.6f vx=%.6f vy=%.6f\n", t, px->id, px->m,px->x, px->y, px->vx, px->vy);
                     //Particle 0: mass=1324.964808 x=0.029175 y=0.014151 vx=0.001617 vy=-0.001198
