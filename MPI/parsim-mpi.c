@@ -652,8 +652,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
                             delta_x = x_aux - px->x;
                             delta_y = y_aux - px->y;
-                            if(delta_x > space_size/grid_size *2 || -delta_x > space_size/grid_size *2 || delta_y > space_size/grid_size *2 || -delta_y > space_size/grid_size *2)
-                                printf("CENTRO DE MASSA MAL CALCULADO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 
                             double distance2_cm = delta_x * delta_x + delta_y * delta_y;  // r^2
                             double distance_cm = sqrt(distance2_cm);
@@ -666,12 +664,18 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                         } 
                     } 
 
+                    int prevx=px->x;
+                    int prevy=px->y;
+
                     px->ax = px->Fx/px->m; 
                     px->ay = px->Fy/px->m;
                     px->x = px->x + px->vx*DELTAT + 0.5*px->ax*DELTAT*DELTAT; //calculate new position x
                     px->y = px->y + px->vy*DELTAT + 0.5*px->ay*DELTAT*DELTAT; //calculate new position y
                     px->vx = px->vx + px->ax*DELTAT; //calculate new velocity along x
                     px->vy = px->vy + px->ay*DELTAT; //calculate new velocity along y
+
+                    if(prevx-px->x > space_size/grid_size*2 || -prevx-px->x > space_size/grid_size*2 || prevy-px->y > space_size/grid_size*2 || -prevy-py->x > space_size/grid_size*2)
+                        printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1!!!!!\n");
                     
                     //printf("t= %d Particle %d: mass=%.6f x=%.6f y=%.6f vx=%.6f vy=%.6f\n", t, px->id, px->m,px->x, px->y, px->vx, px->vy);
                     //Particle 0: mass=1324.964808 x=0.029175 y=0.014151 vx=0.001617 vy=-0.001198
