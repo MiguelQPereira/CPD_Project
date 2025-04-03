@@ -394,12 +394,12 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
     if (incoming_prev_count > 0) {
         recv_count++;
         rcv_prev_par = malloc(incoming_prev_count * sizeof(particle_t));
-        MPI_Irecv(rcv_prev_par, incoming_prev_count, MPI_PARTICLE_T, prev_rank, 0, MPI_COMM_WORLD, &recv_requests[0]);  
+        MPI_Irecv(rcv_prev_par, incoming_prev_count, MPI_PARTICLE_T, prev_rank, 2, MPI_COMM_WORLD, &recv_requests[0]);  
     }    
     if (incoming_next_count > 0) {
         recv_count++;
         rcv_next_par = malloc(incoming_next_count * sizeof(particle_t));
-        MPI_Irecv(rcv_next_par, incoming_next_count, MPI_PARTICLE_T,next_rank, 1, MPI_COMM_WORLD, &recv_requests[1]);
+        MPI_Irecv(rcv_next_par, incoming_next_count, MPI_PARTICLE_T,next_rank, 3, MPI_COMM_WORLD, &recv_requests[1]);
     }
     
     if (prev_count > 0) {
@@ -407,7 +407,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         /*for (int i= 0;i<  to_send_prev.n_particles; i++){
             if(rank ==0 || rank ==1) printf("RACK: %d SEND X PRREV : %lf\n",rank,  to_send_prev.par[i].x);
         }*/
-        MPI_Isend(to_send_prev.par, prev_count, MPI_PARTICLE_T, prev_rank, 1, MPI_COMM_WORLD, &send_requests[0]);
+        MPI_Isend(to_send_prev.par, prev_count, MPI_PARTICLE_T, prev_rank, 3, MPI_COMM_WORLD, &send_requests[0]);
         //printf("RANK: %d , send pre par %lf \n",rank, to_send_prev.par[0].x);
     }
     
@@ -416,7 +416,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size){
         /*for (int i= 0;i<  to_send_next.n_particles; i++){
             //if(rank ==0 || rank ==1)printf("RACK %d SEND X NEXT  %lf\n",rank , to_send_next.par[i].x);
         }*/
-        MPI_Isend(to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 0, MPI_COMM_WORLD, &send_requests[1]);
+        MPI_Isend(to_send_next.par, next_count, MPI_PARTICLE_T, next_rank, 2, MPI_COMM_WORLD, &send_requests[1]);
         //printf("RANK: %d , send next par %d \n",rank, to_send_next.par[0].x);
     }
 
@@ -753,6 +753,8 @@ int main(int argc, char *argv[]){
     for (int i=0; i<rank; i++){
         start_point += work_size[i];
     }
+
+    printf("Rank: %d ; startpoint: %d", rank, start_point);
     
     particles = malloc(work_size[rank] * sizeof(parcell));
     if(particles == NULL) {
