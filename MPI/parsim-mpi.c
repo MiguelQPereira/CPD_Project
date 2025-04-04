@@ -965,7 +965,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
         cell_calculation(st_par, grid_size, space_size, t);
         
-
+        colision = malloc(num_particles * sizeof(ParColision));
         for(int j=0; j<work_size[rank]; j++){
             for (int idx_a=0; idx_a < st_par[j].n_particles; idx_a++){
                 for (int idx_b=idx_a+1; idx_b < st_par[j].n_particles; idx_b++){
@@ -996,6 +996,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                 }
             }
         }
+        free(colision);
 
         MPI_Barrier(MPI_COMM_WORLD);
     }
@@ -1006,9 +1007,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
 void print_result(parcell* st_par, int local_collisions,double exec_time){
 
-    int total_collisions;
-
-    
+    int total_collisions; 
 
     for (int i=0; i<work_size[rank]; i++){
         for(int j=0; j<st_par[i].n_particles; j++){
