@@ -271,7 +271,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         prev_prev_rank = rank - 2;
         next_next_rank = 1;
     }
-    else if(rank==1 ){
+    else if(rank==1){
         prev_rank = 0;
         next_rank = rank + 1;
         prev_prev_rank = psize - 1;
@@ -347,7 +347,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                         to_send_prev.size *= 2;
                     }
 
-                }else if(rank == 0 && psize > 3 && new_cell + start_point >= grid_size*grid_size-work_size[psize-1]-work_size[psize-2]){
+                }else if(rank == 0 && new_cell + start_point >= grid_size*grid_size-work_size[psize-1]-work_size[psize-2]){
 
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].id = st_par[cell].par[id_par].id;
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].x = st_par[cell].par[id_par].x;
@@ -383,7 +383,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                         to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
                         to_send_next.size *= 2;
                     }
-                }else if(rank == psize - 1 && psize > 3 && new_cell + start_point < work_size[0] + work_size[1]){
+                }else if(rank == psize - 1 && new_cell + start_point < work_size[0] + work_size[1]){
 
                     to_send_next_next.par[to_send_next_next.n_particles].id = st_par[cell].par[id_par].id;
                     to_send_next_next.par[to_send_next_next.n_particles].x = st_par[cell].par[id_par].x;
@@ -402,7 +402,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
-                }else if(new_cell < -work_size[rank - 1]-1 && psize > 3){
+                }else if(new_cell < -work_size[rank - 1]-1){
 
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].id = st_par[cell].par[id_par].id;
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].x = st_par[cell].par[id_par].x;
@@ -438,7 +438,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-                }else if(new_cell > work_size[rank] + work_size[rank + 1]-1 && psize > 3){
+                }else if(new_cell > work_size[rank] + work_size[rank + 1]-1){
 
                     to_send_next_next.par[to_send_next_next.n_particles].id = st_par[cell].par[id_par].id;
                     to_send_next_next.par[to_send_next_next.n_particles].x = st_par[cell].par[id_par].x;
@@ -965,7 +965,6 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
         MPI_Recv(positions, 2, MPI_DOUBLE, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
         fprintf(stdout, "%.3f %.3f\n", positions[0], positions[1]);
         fprintf(stdout, "%d\n", total_collisions);
-        fprintf(stderr, "%.1fs\n", exec_time); 
         
     }
 }
@@ -1026,7 +1025,7 @@ int main(int argc, char *argv[]){
     
 
     MPI_Finalize();
-    
+    fprintf(stderr, "%.1fs\n", exec_time); 
 
     free(particles);
     free(cells);
