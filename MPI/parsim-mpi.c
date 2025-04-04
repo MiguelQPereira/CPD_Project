@@ -855,7 +855,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     double delta_x = 0, delta_y = 0; //displacement of the particle in x and y
     int collision_count = 0; //count collisions
     double cell_size = (double)space_size / grid_size;
-    ParColision *colision = malloc(num_particles * sizeof(ParColision));
+    ParColision *colision ;
     //ParColision colision[num_particles];
     particle_t *px,*py;
 
@@ -964,8 +964,9 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         }
 
         cell_calculation(st_par, grid_size, space_size, t);
-        
-        colision = malloc(num_particles * sizeof(ParColision));
+        int aux_size = num_particles / grid_size/ grid_size * 0.1;
+        colision = malloc(aux_size * sizeof(ParColision));
+        int aux = 0;
         for(int j=0; j<work_size[rank]; j++){
             for (int idx_a=0; idx_a < st_par[j].n_particles; idx_a++){
                 for (int idx_b=idx_a+1; idx_b < st_par[j].n_particles; idx_b++){
@@ -977,10 +978,17 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     double distance2 = delta_x * delta_x + delta_y * delta_y;
 
                     if(distance2 <= EPSILON2){
-                        colision[collision_count].a = idx_a;
-                        colision[collision_count].b = idx_b;
-                        colision[collision_count].cell = j;
+                        colision[aux].a = idx_a;
+                        colision[aux].b = idx_b;
+                        colision[aux].cell = j;
+                        aux++;
                         collision_count++;
+
+                        if (aux == aux_size){
+                            colision = realloc (colision, aux_size*2*sizeof(ParColision));
+                            aux_size *= 2; 
+                        }
+                        
                     }
                 }
             }
@@ -997,11 +1005,10 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
             }
         }
         free(colision);
-
         MPI_Barrier(MPI_COMM_WORLD);
     }
     
-    free(colision);
+    
     return collision_count;
 }
 
