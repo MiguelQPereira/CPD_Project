@@ -957,15 +957,14 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         cell_calculation(st_par, grid_size, space_size, t);
 
         for(int j=1; j<work_size[rank]-1; j++){
-            for(int g=j-1; g<j+1; g++){
 
             for (int idx_a=0; idx_a < st_par[j].n_particles; idx_a++){
-                for (int idx_b=0 /*idx_a+1*/; idx_b < st_par[g].n_particles; idx_b++){
+                for (int idx_b=idx_a+1; idx_b < st_par[j].n_particles; idx_b++){
                     if ( st_par[j].par[idx_a].alive == 0 || st_par[g].par[idx_b].alive == 0)
                         continue;
                         
-                    delta_x = st_par[j].par[idx_a].x - st_par[g].par[idx_b].x;
-                    delta_y = st_par[j].par[idx_a].y - st_par[g].par[idx_b].y;
+                    delta_x = st_par[j].par[idx_a].x - st_par[j].par[idx_b].x;
+                    delta_y = st_par[j].par[idx_a].y - st_par[j].par[idx_b].y;
                     double distance2 = delta_x * delta_x + delta_y * delta_y;
 
                     if(distance2 <= EPSILON2){
@@ -976,7 +975,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     } 
                 } 
             }
-        }
         }
         
         for(int n=0; n<collision_count; n++){
