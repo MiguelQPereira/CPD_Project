@@ -960,6 +960,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
 
     //MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0){
+        MPI_Status status;
         MPI_Recv(positions, 2, MPI_DOUBLE, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
         fprintf(stdout, "%.3f %.3f\n", positions[0], positions[1]);
         fprintf(stdout, "%d\n", total_collisions);
