@@ -944,6 +944,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 void print_result(parcell* st_par, int local_collisions,double exec_time){
 
     int total_collisions; 
+    double positions[2];
 
     for (int i=0; i<work_size[rank]; i++){
         for(int j=0; j<st_par[i].n_particles; j++){
