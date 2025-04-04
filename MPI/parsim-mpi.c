@@ -239,10 +239,10 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
     to_send_prev.par = malloc(work_size[rank] * sizeof(particle_t));
     to_send_prev.size = work_size[rank];
     to_send_prev.n_particles = 0;
-    to_send_next_next.par = malloc(work_size[rank] * sizeof(particle_t));
+    to_send_next_next.par = malloc(2 * sizeof(particle_t));
     to_send_next_next.size = work_size[rank];
     to_send_next_next.n_particles = 0;
-    to_send_prev_prev.par = malloc(work_size[rank] * sizeof(particle_t));
+    to_send_prev_prev.par = malloc(2 * sizeof(particle_t));
     to_send_prev_prev.size = work_size[rank];
     to_send_prev_prev.n_particles = 0;
 
@@ -269,7 +269,19 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         prev_rank = rank -1;
         prev_prev_rank = rank - 2;
         next_next_rank = 1;
-    }    
+    }
+    else if(rank==1){
+        prev_rank = 0;
+        next_rank = rank + 1;
+        prev_prev_rank = psize - 1;
+        next_next_rank = rank + 2; 
+    }
+    else if(rank == psize-2){
+        next_rank = psize-1;
+        prev_rank = rank -1;
+        prev_prev_rank = rank - 2;
+        next_next_rank = 0;
+    }
     else{
         next_rank = rank + 1;
         prev_rank = rank -1;
