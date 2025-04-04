@@ -682,7 +682,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].vx = rcv_prev_par[i].vx;
             st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_prev_par[i].vy;
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_prev_par[i].m;
-            st_par[new_cell].par[st_par[new_cell].n_particles].alive = 1;// rcv_prev_par[i].alive;
+            st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_prev_par[i].alive;
             
             st_par[new_cell].n_particles++;
             
@@ -719,7 +719,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].vx = rcv_prev_prev_par[i].vx;
             st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_prev_prev_par[i].vy;
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_prev_prev_par[i].m;
-            st_par[new_cell].par[st_par[new_cell].n_particles].alive = 1;//rcv_prev_prev_par[i].alive;
+            st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_prev_prev_par[i].alive;
             
             st_par[new_cell].n_particles++;
             
@@ -797,7 +797,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].vx = rcv_next_next_par[i].vx;
             st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_next_next_par[i].vy;
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_next_next_par[i].m;
-            st_par[new_cell].par[st_par[new_cell].n_particles].alive = 1; //rcv_next_next_par[i].alive;
+            st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_next_next_par[i].alive;
             st_par[new_cell].n_particles++;
 
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
@@ -982,7 +982,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
             st_par[colision[n].cell].par[colision[n].b].alive = 0;
             for(int m=n+1; m<collision_count; m++){
-                if((colision[n].cell == colision[m].cell) && (colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a)){
+                if((colision[n].cell == colision[m].cell) || (colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a)){
                     collision_count--;
                     continue;
                 }
