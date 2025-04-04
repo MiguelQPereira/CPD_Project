@@ -219,7 +219,9 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, l
         MPI_Bcast(&cm[aux_start], work_size[i], MPI_CENTER_MASS, i, MPI_COMM_WORLD);
         aux_start += work_size[i];
 
-    }    
+    }   
+    MPI_Barrier(MPI_COMM_WORLD);
+    
 }
 
 void cell_calculation(parcell* st_par, long grid_size, double space_size, int t){
