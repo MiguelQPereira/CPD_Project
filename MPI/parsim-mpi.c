@@ -853,8 +853,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         
         calc_center_mass(cells, num_particles, st_par, grid_size);
 
-        cell_calculation(st_par, grid_size, space_size, t);
-
         for(int j=0; j< work_size[rank] ;j++){
 
             for(int k = 0; k<st_par[j].n_particles; k++){  
@@ -975,7 +973,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                         collision_count++;
                     } 
                 } 
-            }                
+            }
         }
         
         for(int n=0; n<collision_count; n++){
@@ -1008,7 +1006,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
     }
     MPI_Reduce(&local_collisions, &total_collisions, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    //MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0){
         fprintf(stdout, "%d\n", total_collisions);
         fprintf(stdout, "%.1fs\n", exec_time);
