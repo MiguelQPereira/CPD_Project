@@ -651,8 +651,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             if (new_cell < 0 || new_cell >= work_size[rank]) {
                 continue; 
             }
-            
-            st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_next_par[i];
+
+            st_par[new_cell].par[st_par[new_cell].n_particles].id = rcv_next_next_par[i].id;
+            st_par[new_cell].par[st_par[new_cell].n_particles].x = rcv_next_next_par[i].x;
+            st_par[new_cell].par[st_par[new_cell].n_particles].y = rcv_next_next_par[i].y;
+            st_par[new_cell].par[st_par[new_cell].n_particles].vx = rcv_next_next_par[i].vx;
+            st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_next_next_par[i].vy;
+            st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_next_next_par[i].m;
+            st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_next_next_par[i].alive;
             st_par[new_cell].n_particles++;
 
             if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1 && st_par[new_cell].par[st_par[new_cell].n_particles].alive != 0){
@@ -684,7 +690,13 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                 continue; 
             }
             
-            st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_next_next_par[i];
+            st_par[new_cell].par[st_par[new_cell].n_particles].id = rcv_next_par[i].id;
+            st_par[new_cell].par[st_par[new_cell].n_particles].x = rcv_next_par[i].x;
+            st_par[new_cell].par[st_par[new_cell].n_particles].y = rcv_next_par[i].y;
+            st_par[new_cell].par[st_par[new_cell].n_particles].vx = rcv_next_par[i].vx;
+            st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_next_par[i].vy;
+            st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_next_par[i].m;
+            st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_next_par[i].alive;
             st_par[new_cell].n_particles++;
 
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
