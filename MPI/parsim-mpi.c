@@ -240,10 +240,10 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
     to_send_prev.size = work_size[rank];
     to_send_prev.n_particles = 0;
     to_send_next_next.par = malloc(2 * sizeof(particle_t));
-    to_send_next_next.size = work_size[rank];
+    to_send_next_next.size = 2;
     to_send_next_next.n_particles = 0;
     to_send_prev_prev.par = malloc(2 * sizeof(particle_t));
-    to_send_prev_prev.size = work_size[rank];
+    to_send_prev_prev.size = 2;
     to_send_prev_prev.n_particles = 0;
 
     int recv_count = 0;
