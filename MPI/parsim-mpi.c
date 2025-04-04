@@ -271,13 +271,13 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         prev_prev_rank = rank - 2;
         next_next_rank = 1;
     }
-    else if(rank==1){
+    else if(rank==1 && rank > 2){
         prev_rank = 0;
         next_rank = rank + 1;
         prev_prev_rank = psize - 1;
         next_next_rank = rank + 2; 
     }
-    else if(rank == psize-2){
+    else if(rank == psize-2 && rank > 2){
         next_rank = psize-1;
         prev_rank = rank -1;
         prev_prev_rank = rank - 2;
