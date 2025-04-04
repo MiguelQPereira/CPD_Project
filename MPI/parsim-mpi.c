@@ -984,7 +984,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
             for(int m=n+1; m<collision_count; m++){
                 if((colision[n].cell == colision[m].cell) && (colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a)){
                     collision_count--;
-                    continue;
                 }
             }
         }
