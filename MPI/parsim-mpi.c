@@ -1022,6 +1022,7 @@ int main(int argc, char *argv[]){
     int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
     exec_time += omp_get_wtime();
     print_result(particles, local_colisions,exec_time);
+    fprintf(stderr, "%.1fs\n", exec_time); 
         
     MPI_Finalize();
 
