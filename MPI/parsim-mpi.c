@@ -960,7 +960,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
             for (int idx_a=0; idx_a < st_par[j].n_particles; idx_a++){
                 for (int idx_b=idx_a+1; idx_b < st_par[j].n_particles; idx_b++){
-                    if ( st_par[j].par[idx_a].alive == 0 || st_par[g].par[idx_b].alive == 0)
+                    if ( st_par[j].par[idx_a].alive == 0 || st_par[k].par[idx_b].alive == 0)
                         continue;
                         
                     delta_x = st_par[j].par[idx_a].x - st_par[j].par[idx_b].x;
