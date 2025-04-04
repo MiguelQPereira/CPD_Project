@@ -219,8 +219,7 @@ void calc_center_mass(center_mass * cm, long long num_particles, parcell* par, l
         MPI_Bcast(&cm[aux_start], work_size[i], MPI_CENTER_MASS, i, MPI_COMM_WORLD);
         aux_start += work_size[i];
 
-    }   
-    MPI_Barrier(MPI_COMM_WORLD);
+    }
     
 }
 
@@ -957,15 +956,16 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 
         cell_calculation(st_par, grid_size, space_size, t);
 
-        for(int j=0; j<work_size[rank] ;j++){
+        for(int j=0; j<work_size[rank]; j++){
+            for(int g=0; g<work_size[rank]; g++){
 
             for (int idx_a=0; idx_a < st_par[j].n_particles; idx_a++){
                 for (int idx_b=idx_a+1; idx_b < st_par[j].n_particles; idx_b++){
                     if ( st_par[j].par[idx_a].alive == 0 || st_par[j].par[idx_b].alive == 0)
                         continue;
                         
-                    delta_x = st_par[j].par[idx_a].x - st_par[j].par[idx_b].x;
-                    delta_y = st_par[j].par[idx_a].y - st_par[j].par[idx_b].y;
+                    delta_x = st_par[j].par[idx_a].x - st_par[k].par[idx_b].x;
+                    delta_y = st_par[j].par[idx_a].y - st_par[k].par[idx_b].y;
                     double distance2 = delta_x * delta_x + delta_y * delta_y;
 
                     if(distance2 <= EPSILON2){
@@ -976,6 +976,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     } 
                 } 
             }
+        }
         }
         
         for(int n=0; n<collision_count; n++){
