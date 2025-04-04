@@ -421,7 +421,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
-                }else if(new_cell < -work_size[rank - 1]){
+                }else if(new_cell < -work_size[rank - 1]-1){
 
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].id = st_par[cell].par[id_par].id;
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].x = st_par[cell].par[id_par].x;
