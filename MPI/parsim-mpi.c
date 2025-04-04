@@ -964,8 +964,8 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                     if ( st_par[j].par[idx_a].alive == 0 || st_par[j].par[idx_b].alive == 0)
                         continue;
                         
-                    delta_x = st_par[j].par[idx_a].x - st_par[k].par[idx_b].x;
-                    delta_y = st_par[j].par[idx_a].y - st_par[k].par[idx_b].y;
+                    delta_x = st_par[j].par[idx_a].x - st_par[g].par[idx_b].x;
+                    delta_y = st_par[j].par[idx_a].y - st_par[g].par[idx_b].y;
                     double distance2 = delta_x * delta_x + delta_y * delta_y;
 
                     if(distance2 <= EPSILON2){
