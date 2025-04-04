@@ -1075,6 +1075,7 @@ int main(int argc, char *argv[]){
     exec_time = -omp_get_wtime();
     int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
     exec_time += omp_get_wtime();
+    printf("Local Collisions: %d", local_colisions);
     print_result(particles, local_colisions,exec_time);
         
     MPI_Finalize();
