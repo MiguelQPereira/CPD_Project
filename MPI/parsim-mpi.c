@@ -964,7 +964,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         }
 
         cell_calculation(st_par, grid_size, space_size, t);
-        int aux_size = num_particles / grid_size/ grid_size * 0.1;
+        int aux_size = (num_particles / grid_size/ grid_size) * 0.1;
         colision = malloc(aux_size * sizeof(ParColision));
         int aux = 0;
         for(int j=0; j<work_size[rank]; j++){
@@ -994,7 +994,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
             }
         }
         
-        for(int n=0; n<collision_count; n++){
+        for(int n=0; n<aux; n++){
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
             st_par[colision[n].cell].par[colision[n].b].alive = 0;
             for(int m=n+1; m<collision_count; m++){
