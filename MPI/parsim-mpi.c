@@ -348,17 +348,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                }else if(rank == psize-1 && new_cell < work_size[0]){
-                    to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
-                    to_send_next.n_particles ++;
-
-                    
-                    if(to_send_next.n_particles == to_send_next.size){
-                        to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
-                        to_send_next.size *= 2;
-                    }
-                
-                }else if(rank == psize - 1 && new_cell < -work_size[rank-1]){
+                }else if(rank == psize - 1 && new_cell < -work_size[rank-1]-work_size[rank-2]){
 
                     to_send_next_next.par[to_send_next_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next_next.n_particles ++;
@@ -367,6 +357,17 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     if(to_send_next_next.n_particles == to_send_next_next.size){
                         to_send_next_next.par = realloc(to_send_next_next.par, to_send_next_next.size * 2 * sizeof(particle_t));
                         to_send_next_next.size *= 2;
+                    }
+
+   
+                }else if(rank == psize-1 && new_cell + start_point < work_size[0]){
+                    to_send_next.par[to_send_next.n_particles] = st_par[cell].par[id_par];
+                    to_send_next.n_particles ++;
+
+                    
+                    if(to_send_next.n_particles == to_send_next.size){
+                        to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
+                        to_send_next.size *= 2;
                     }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
