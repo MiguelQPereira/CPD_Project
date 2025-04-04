@@ -965,6 +965,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
         MPI_Recv(positions, 2, MPI_DOUBLE, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
         fprintf(stdout, "%.3f %.3f\n", positions[0], positions[1]);
         fprintf(stdout, "%d\n", total_collisions);
+        fprintf(stderr, "%.1fs\n", exec_time); 
         
     }
 }
@@ -1025,7 +1026,7 @@ int main(int argc, char *argv[]){
     
 
     MPI_Finalize();
-    fprintf(stderr, "%.1fs\n", exec_time); 
+    
 
     free(particles);
     free(cells);
