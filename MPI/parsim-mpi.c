@@ -412,9 +412,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].m = st_par[cell].par[id_par].m;
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].alive = st_par[cell].par[id_par].alive;
 
-                    if(to_send_prev_prev.par[to_send_prev_prev.n_particles].alive == 0){
-                        printf("CONA\n");
-                    } 
 
                     to_send_prev_prev.n_particles ++;
                     
@@ -432,10 +429,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_prev.par[to_send_prev.n_particles].vy = st_par[cell].par[id_par].vy;
                     to_send_prev.par[to_send_prev.n_particles].m = st_par[cell].par[id_par].m;
                     to_send_prev.par[to_send_prev.n_particles].alive = st_par[cell].par[id_par].alive;
-
-                    if(to_send_prev.par[to_send_prev.n_particles].alive == 0){
-                        printf("CONA\n");
-                    } 
 
                     to_send_prev.n_particles ++;
                     
@@ -455,10 +448,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_next_next.par[to_send_next_next.n_particles].m = st_par[cell].par[id_par].m;
                     to_send_next_next.par[to_send_next_next.n_particles].alive = st_par[cell].par[id_par].alive;
 
-                    if(to_send_next_next.par[to_send_next_next.n_particles].alive == 0){
-                        printf("CONA\n");
-                    }
-
                     to_send_next_next.n_particles ++;
                     
                     if(to_send_next_next.n_particles == to_send_next_next.size){
@@ -477,10 +466,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_next.par[to_send_next.n_particles].m = st_par[cell].par[id_par].m;
                     to_send_next.par[to_send_next.n_particles].alive = st_par[cell].par[id_par].alive;
 
-                    if(to_send_next.par[to_send_next.n_particles].alive == 0){
-                        printf("CONA\n");
-                    }
-
                     to_send_next.n_particles ++;
                     
                     if(to_send_next.n_particles == to_send_next.size){
@@ -497,10 +482,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     st_par[new_cell].par[st_par[new_cell].n_particles].vy = st_par[cell].par[id_par].vy;
                     st_par[new_cell].par[st_par[new_cell].n_particles].m = st_par[cell].par[id_par].m;
                     st_par[new_cell].par[st_par[new_cell].n_particles].alive = st_par[cell].par[id_par].alive;
-
-                    if(st_par[new_cell].par[st_par[new_cell].n_particles].alive == 0){
-                        printf("CONA\n");
-                    }
 
                     st_par[new_cell].n_particles++;
                     
@@ -654,11 +635,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
-            if (new_cell < 0 || new_cell >= work_size[rank]) {
-                printf("1- Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
-                continue; 
-            }
-
             st_par[new_cell].par[st_par[new_cell].n_particles].id = rcv_prev_par[i].id;
             st_par[new_cell].par[st_par[new_cell].n_particles].x = rcv_prev_par[i].x;
             st_par[new_cell].par[st_par[new_cell].n_particles].y = rcv_prev_par[i].y;
@@ -666,9 +642,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_prev_par[i].vy;
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_prev_par[i].m;
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_prev_par[i].alive;
-            if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1){
-                printf("Fudeu %d\n", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
-            }
             st_par[new_cell].n_particles++;
             
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
@@ -693,11 +666,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
-            if (new_cell < 0 || new_cell >= work_size[rank]) {
-                printf("2- Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
-                continue; 
-            }
-
             st_par[new_cell].par[st_par[new_cell].n_particles].id = rcv_prev_prev_par[i].id;
             st_par[new_cell].par[st_par[new_cell].n_particles].x = rcv_prev_prev_par[i].x;
             st_par[new_cell].par[st_par[new_cell].n_particles].y = rcv_prev_prev_par[i].y;
@@ -705,9 +673,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_prev_prev_par[i].vy;
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_prev_prev_par[i].m;
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_prev_prev_par[i].alive;
-            if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1){
-                printf("Fudeu %d\n", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
-            }
             
             st_par[new_cell].n_particles++;
             
@@ -734,11 +699,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
-            if (new_cell < 0 || new_cell >= work_size[rank]) {
-                printf("3- Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
-                continue; 
-            }
-
             st_par[new_cell].par[st_par[new_cell].n_particles].id = rcv_next_par[i].id;
             st_par[new_cell].par[st_par[new_cell].n_particles].x = rcv_next_par[i].x;
             st_par[new_cell].par[st_par[new_cell].n_particles].y = rcv_next_par[i].y;
@@ -746,9 +706,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_next_par[i].vy;
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_next_par[i].m;
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_next_par[i].alive;
-            if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1){
-                printf("Fudeu %d\n", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
-            }
             
             st_par[new_cell].n_particles++;
 
@@ -772,13 +729,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             int grid_y = (int)grid_y_aux;
         
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
-
-            if (new_cell < 0 || new_cell >= work_size[rank]) {
-                printf("4-Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
-                continue; 
-            }
-            
-            
+                        
             st_par[new_cell].par[st_par[new_cell].n_particles].id = rcv_next_next_par[i].id;
             st_par[new_cell].par[st_par[new_cell].n_particles].x = rcv_next_next_par[i].x;
             st_par[new_cell].par[st_par[new_cell].n_particles].y = rcv_next_next_par[i].y;
@@ -786,10 +737,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_next_next_par[i].vy;
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_next_next_par[i].m;
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_next_next_par[i].alive;
-            if(st_par[new_cell].par[st_par[new_cell].n_particles-1].alive != 1){
-                printf("Fudeu %d\n", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
-            }
-            
             st_par[new_cell].n_particles++;
 
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
@@ -1065,7 +1012,6 @@ int main(int argc, char *argv[]){
     exec_time = -omp_get_wtime();
     int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
     exec_time += omp_get_wtime();
-    //printf("Rank: %d Local Collisions: %d",rank, local_colisions);
     print_result(particles, local_colisions,exec_time);
         
     MPI_Finalize();
