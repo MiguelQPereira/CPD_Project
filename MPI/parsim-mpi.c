@@ -827,7 +827,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
                 }
 
                 if (st_par[j].par[k].id == 2621){
-                    printf("alive: %d\n", st_par[j].par[k].);
+                    printf("alive: %d\n", st_par[j].par[k].alive);
                 }
             }
         }
