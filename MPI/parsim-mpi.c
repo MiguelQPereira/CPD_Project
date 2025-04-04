@@ -964,6 +964,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
         }
 
         cell_calculation(st_par, grid_size, space_size, t);
+        
 
         for(int j=1; j<work_size[rank]-1; j++){
             for (int idx_a=0; idx_a < st_par[j].n_particles; idx_a++){
