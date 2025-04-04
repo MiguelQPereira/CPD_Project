@@ -271,7 +271,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         prev_prev_rank = rank - 2;
         next_next_rank = 1;
     }
-    else if(rank==1){
+    else if(rank==1 ){
         prev_rank = 0;
         next_rank = rank + 1;
         prev_prev_rank = psize - 1;
@@ -965,7 +965,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
         MPI_Recv(positions, 2, MPI_DOUBLE, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
         fprintf(stdout, "%.3f %.3f\n", positions[0], positions[1]);
         fprintf(stdout, "%d\n", total_collisions);
-        
+        fprintf(stderr, "%.1fs\n", exec_time); 
         
     }
 }
