@@ -330,7 +330,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             
             if (new_cell != cell){
             
-                if(rank == 0 && new_cell + start_point > grid_size*grid_size-work_size[psize-1]){
+                if(rank == 0 && new_cell + start_point >= grid_size*grid_size - work_size[psize-1]){
 
                     to_send_prev.par[to_send_prev.n_particles].id = st_par[cell].par[id_par].id;
                     to_send_prev.par[to_send_prev.n_particles].x = st_par[cell].par[id_par].x;
@@ -340,19 +340,14 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_prev.par[to_send_prev.n_particles].m = st_par[cell].par[id_par].m;
                     to_send_prev.par[to_send_prev.n_particles].alive = st_par[cell].par[id_par].alive;
 
-                    if(to_send_prev.par[to_send_prev.n_particles].alive == 0){
-                        printf("CONA\n");
-                    } 
-
                     to_send_prev.n_particles ++;
-
                     
                     if(to_send_prev.n_particles == to_send_prev.size){
                         to_send_prev.par = realloc(to_send_prev.par, to_send_prev.size * 2 * sizeof(particle_t));
                         to_send_prev.size *= 2;
                     }
 
-                }else if(rank == 0 && new_cell + start_point > grid_size*grid_size-work_size[psize-1]-work_size[psize-2]){
+                }else if(rank == 0 && new_cell + start_point >= grid_size*grid_size-work_size[psize-1]-work_size[psize-2]){
 
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].id = st_par[cell].par[id_par].id;
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].x = st_par[cell].par[id_par].x;
@@ -362,12 +357,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].m = st_par[cell].par[id_par].m;
                     to_send_prev_prev.par[to_send_prev_prev.n_particles].alive = st_par[cell].par[id_par].alive;
 
-                    if(to_send_prev_prev.par[to_send_prev_prev.n_particles].alive == 0){
-                        printf("CONA\n");
-                    } 
-
                     to_send_prev_prev.n_particles ++;
-
                     
                     if(to_send_prev_prev.n_particles == to_send_prev_prev.size){
                         to_send_prev_prev.par = realloc(to_send_prev_prev.par, to_send_prev_prev.size * 2 * sizeof(particle_t));
@@ -386,10 +376,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_next.par[to_send_next.n_particles].m = st_par[cell].par[id_par].m;
                     to_send_next.par[to_send_next.n_particles].alive = st_par[cell].par[id_par].alive;
 
-                    if(to_send_next.par[to_send_next.n_particles].alive == 0){
-                        printf("CONA\n");
-                    } 
-
                     to_send_next.n_particles ++;
 
                     
@@ -406,10 +392,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     to_send_next_next.par[to_send_next_next.n_particles].vy = st_par[cell].par[id_par].vy;
                     to_send_next_next.par[to_send_next_next.n_particles].m = st_par[cell].par[id_par].m;
                     to_send_next_next.par[to_send_next_next.n_particles].alive = st_par[cell].par[id_par].alive;
-
-                    if(to_send_next_next.par[to_send_next_next.n_particles].alive == 0){
-                        printf("CONA\n");
-                    } 
 
                     to_send_next_next.n_particles ++;
 
