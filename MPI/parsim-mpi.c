@@ -845,7 +845,6 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
     double delta_x = 0, delta_y = 0; //displacement of the particle in x and y
     int collision_count = 0; //count collisions
     double cell_size = (double)space_size / grid_size;
-    //double cell_size = (double)space_size / grid_size;
     ParColision *colision = malloc(num_particles * sizeof(ParColision));
     //ParColision colision[num_particles];
     particle_t *px,*py;
@@ -982,7 +981,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
             st_par[colision[n].cell].par[colision[n].a].alive = 0;
             st_par[colision[n].cell].par[colision[n].b].alive = 0;
             for(int m=n+1; m<collision_count; m++){
-                if((colision[n].cell == colision[m].cell) || (colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a)){
+                if((colision[n].cell == colision[m].cell) && (colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a)){
                     collision_count--;
                     continue;
                 }
@@ -1006,7 +1005,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
                 fprintf(stdout, "%.3f %.3f\n", st_par[i].par[j].x, st_par[i].par[j].y);
         }
     }
-    
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Reduce(&local_collisions, &total_collisions, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     //MPI_Barrier(MPI_COMM_WORLD);
