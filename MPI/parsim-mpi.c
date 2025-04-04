@@ -292,6 +292,10 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
     for(int cell = 0; cell < work_size[rank]; cell++){
         for (int id_par=0; id_par < st_par[cell].n_particles; id_par++){
 
+            if(st_par[cell].par[id_par].alive != 1){
+                continue;
+            }
+
             x = st_par[cell].par[id_par].x;
             y = st_par[cell].par[id_par].y;
 
@@ -862,6 +866,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
             for(int m=n+1; m<collision_count; m++){
                 if((colision[n].cell == colision[m].cell) && (colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a)){
                     collision_count--;
+                    continue;
                 }
             }
         }
