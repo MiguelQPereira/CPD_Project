@@ -761,7 +761,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].n_particles++;
 
             if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1){
-                //printf("Fudeu %d\n", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
+                printf("Fudeu %d\n", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
             }
 
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
@@ -984,6 +984,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
             for(int m=n+1; m<collision_count; m++){
                 if((colision[n].cell == colision[m].cell) && (colision[n].b == colision[m].a || colision[n].b == colision[m].b || colision[n].a == colision[m].a)){
                     collision_count--;
+                    continue;
                 }
             }
         }
