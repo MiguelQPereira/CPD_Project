@@ -711,6 +711,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
             if (new_cell < 0 || new_cell >= work_size[rank]) {
+                printf("Erro, celula fora do range");
                 continue; 
             }
 
@@ -748,6 +749,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
             if (new_cell < 0 || new_cell >= work_size[rank]) {
+                printf("Erro, celula fora do range");
                 continue; 
             }
 
@@ -786,6 +788,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
             if (new_cell < 0 || new_cell >= work_size[rank]) {
+                printf("Erro, celula fora do range");
                 continue; 
             }
             
