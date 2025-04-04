@@ -965,6 +965,8 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
         MPI_Recv(positions, 2, MPI_DOUBLE, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
         fprintf(stdout, "%.3f %.3f\n", positions[0], positions[1]);
         fprintf(stdout, "%d\n", total_collisions);
+
+    print_result(particles, local_colisions,exec_time);
         
     }
 }
@@ -1021,7 +1023,6 @@ int main(int argc, char *argv[]){
     exec_time = -omp_get_wtime();
     int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
     exec_time += omp_get_wtime();
-    print_result(particles, local_colisions,exec_time);
     
 
     MPI_Finalize();
