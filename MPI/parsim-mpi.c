@@ -1025,7 +1025,6 @@ int main(int argc, char *argv[]){
     
 
     MPI_Finalize();
-    fprintf(stderr, "%.1fs\n", exec_time); 
 
     free(particles);
     free(cells);
