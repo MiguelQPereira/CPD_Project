@@ -265,6 +265,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         if (psize > 2){
             prev_prev_rank = psize - 2;
             next_next_rank = rank + 2; 
+        }else{
+            prev_prev_rank = rank;
+            next_next_rank = rank;
         }
         
     }
@@ -274,6 +277,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         if (psize > 2){
             prev_prev_rank = rank - 2;
             next_next_rank = 1;
+        }else{
+            prev_prev_rank = rank;
+            next_next_rank = rank;
         }
     }
     else if(rank==1){
@@ -282,6 +288,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         if (psize > 2){
             prev_prev_rank = psize - 1;
             next_next_rank = rank + 2; 
+        }else{
+            prev_prev_rank = rank;
+            next_next_rank = rank;
         }
     }
     else if(rank == psize-2){
@@ -290,6 +299,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         if (psize > 2){
             prev_prev_rank = rank - 2;
             next_next_rank = 0;
+        }else{
+            prev_prev_rank = rank;
+            next_next_rank = rank;
         }
     }
     else{
@@ -298,6 +310,9 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
         if (psize > 2){
             prev_prev_rank = rank - 2;
             next_next_rank = rank + 2;
+        }else{
+            prev_prev_rank = rank;
+            next_next_rank = rank;
         }
     }
 
