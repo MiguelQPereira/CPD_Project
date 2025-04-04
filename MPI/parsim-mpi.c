@@ -945,6 +945,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
 
     int total_collisions; 
     double positions[2];
+    int send_rank;
 
     for (int i=0; i<work_size[rank]; i++){
         for(int j=0; j<st_par[i].n_particles; j++){
@@ -952,7 +953,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
                 positions[0] = st_par[i].par[j].x;
                 positions[1] = st_par[i].par[j].y;
                 // Envia para o rank 0
-                int send_rank = rank
+                send_rank = rank;
                 MPI_Send(positions, 2, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
             }
                 //fprintf(stdout, "%.3f %.3f\n", st_par[i].par[j].x, st_par[i].par[j].y);
