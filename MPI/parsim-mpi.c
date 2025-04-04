@@ -952,6 +952,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
                 positions[0] = st_par[i].par[j].x;
                 positions[1] = st_par[i].par[j].y;
                 // Envia para o rank 0
+                int send_rank = rank
                 MPI_Send(positions, 2, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
             }
                 //fprintf(stdout, "%.3f %.3f\n", st_par[i].par[j].x, st_par[i].par[j].y);
@@ -961,7 +962,7 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
 
     //MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0){
-        MPI_Recv(positions, 2, MPI_DOUBLE, src, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(positions, 2, MPI_DOUBLE, send_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         fprintf(stdout, "%.3f %.3f\n", positions[0], positions[1]);
         fprintf(stdout, "%d\n", total_collisions);
         fprintf(stderr, "%.1fs\n", exec_time);
