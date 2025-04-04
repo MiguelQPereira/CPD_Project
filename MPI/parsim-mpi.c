@@ -674,7 +674,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
             if (new_cell < 0 || new_cell >= work_size[rank]) {
-                printf("Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
+                printf("1- Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
                 continue; 
             }
 
@@ -711,7 +711,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
             if (new_cell < 0 || new_cell >= work_size[rank]) {
-                printf("Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
+                printf("2- Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
                 continue; 
             }
 
@@ -749,7 +749,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
             if (new_cell < 0 || new_cell >= work_size[rank]) {
-                printf("Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
+                printf("3- Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
                 continue; 
             }
 
@@ -788,7 +788,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             int new_cell = (grid_x * grid_size + grid_y) - start_point;
 
             if (new_cell < 0 || new_cell >= work_size[rank]) {
-                printf("Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
+                printf("4-Erro: new_cell fora dos limites! Rank: %d, new_cell: %d\n", rank, new_cell+start_point);
                 continue; 
             }
             
