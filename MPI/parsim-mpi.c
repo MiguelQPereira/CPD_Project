@@ -348,7 +348,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                }else if(rank = psize - 1 && new_cell < -work_size[rank-1]-work_size[rank-2]){
+                }else if(rank == psize - 1 && new_cell < -work_size[rank-1]-work_size[rank-2]){
 
                     to_send_next_next.par[to_send_next_next.n_particles] = st_par[cell].par[id_par];
                     to_send_next_next.n_particles ++;
