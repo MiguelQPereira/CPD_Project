@@ -584,6 +584,10 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_prev_par[i].alive;
             
             st_par[new_cell].n_particles++;
+
+            if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1){
+                printf("Fudeu -- %d", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
+            }
             
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
                 particle_t *new_par = realloc(st_par[new_cell].par, st_par[new_cell].size * 2 * sizeof(particle_t));
@@ -618,10 +622,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_prev_prev_par[i].vy;
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_prev_prev_par[i].m;
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_prev_prev_par[i].alive;
-
-            if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1){
-                printf("Fudeu -- %d", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
-            }
             
             st_par[new_cell].n_particles++;
             
@@ -661,7 +661,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_next_par[i].alive;
             st_par[new_cell].n_particles++;
 
-            if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1 && st_par[new_cell].par[st_par[new_cell].n_particles].alive != 0){
+            if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1){
                 printf("Fudeu %d\n", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
             }
 
