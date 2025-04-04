@@ -757,7 +757,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].vx = rcv_next_par[i].vx;
             st_par[new_cell].par[st_par[new_cell].n_particles].vy = rcv_next_par[i].vy;
             st_par[new_cell].par[st_par[new_cell].n_particles].m = rcv_next_par[i].m;
-            st_par[new_cell].par[st_par[new_cell].n_particles].alive = 1; //rcv_next_par[i].alive;
+            st_par[new_cell].par[st_par[new_cell].n_particles].alive = rcv_next_par[i].alive;
             st_par[new_cell].n_particles++;
 
             if(st_par[new_cell].par[st_par[new_cell].n_particles-1].alive != 1){
