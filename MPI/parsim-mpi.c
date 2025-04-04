@@ -655,8 +655,8 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles] = rcv_next_par[i];
             st_par[new_cell].n_particles++;
 
-            if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1){
-                printf("Fudeu %d", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
+            if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1 && st_par[new_cell].par[st_par[new_cell].n_particles].alive != 0){
+                printf("Fudeu %d\n", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
             }
 
             if (st_par[new_cell].n_particles >= st_par[new_cell].size) {
