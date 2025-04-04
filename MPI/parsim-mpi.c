@@ -760,7 +760,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
             st_par[new_cell].par[st_par[new_cell].n_particles].alive = 1; //rcv_next_par[i].alive;
             st_par[new_cell].n_particles++;
 
-            if(st_par[new_cell].par[st_par[new_cell].n_particles].alive != 1){
+            if(st_par[new_cell].par[st_par[new_cell].n_particles-1].alive != 1){
                 printf("Fudeu %d\n", st_par[new_cell].par[st_par[new_cell].n_particles].alive);
             }
 
