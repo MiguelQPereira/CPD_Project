@@ -205,11 +205,6 @@ void grid_calculation(center_mass ** cm, long long num_particles, double cell_si
                 if (cm[wrapped_x][wrapped_y].n_par >= cm[wrapped_x][wrapped_y].cap - 1) {
                     const int new_cap = cm[wrapped_x][wrapped_y].cap * 2;
                     int *temp = realloc(cm[wrapped_x][wrapped_y].par_index, new_cap * sizeof(int));
-                    if (!temp) {
-                        fprintf(stderr, "Realloc failed for grid cell [%d][%d]\n", wrapped_x, wrapped_y);
-                        omp_unset_lock(&grid_locks[wrapped_x][wrapped_y]);
-                        continue;
-                    }
                     cm[wrapped_x][wrapped_y].par_index = temp;
                     cm[wrapped_x][wrapped_y].cap = new_cap;
                 }
@@ -457,7 +452,6 @@ int main(int argc, char *argv[]){
     long long num_timesteps = atoll(argv[5]);
 
     particle_t* particles = malloc(num_particles * sizeof(particle_t));
-    
     init_particles(sseed, space_size, grid_size, num_particles, particles);
     exec_time = -omp_get_wtime();
     

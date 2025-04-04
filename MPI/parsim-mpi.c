@@ -944,6 +944,7 @@ int simulation(center_mass *cells, double space_size, long grid_size, long long 
 void print_result(parcell* st_par, int local_collisions,double exec_time){
 
     int total_collisions; 
+    double positions[2];
 
     for (int i=0; i<work_size[rank]; i++){
         for(int j=0; j<st_par[i].n_particles; j++){
@@ -960,10 +961,12 @@ void print_result(parcell* st_par, int local_collisions,double exec_time){
 
     //MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0){
-        MPI_Recv(positions, 2, MPI_DOUBLE, src, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Status status;
+        MPI_Recv(positions, 2, MPI_DOUBLE, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
         fprintf(stdout, "%.3f %.3f\n", positions[0], positions[1]);
         fprintf(stdout, "%d\n", total_collisions);
-        fprintf(stderr, "%.1fs\n", exec_time);
+        fprintf(stderr, "%.1fs\n", exec_time); 
+        
     }
 }
 
@@ -1020,7 +1023,8 @@ int main(int argc, char *argv[]){
     int local_colisions = simulation(cells, space_size, grid_size, num_particles, num_timesteps, particles);
     exec_time += omp_get_wtime();
     print_result(particles, local_colisions,exec_time);
-        
+    
+
     MPI_Finalize();
 
     free(particles);

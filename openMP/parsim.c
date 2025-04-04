@@ -29,7 +29,7 @@ typedef struct cm_{
         double X; //X center of mass
         double Y; //Y of center of mass
         double M; //sum of the mass of each particle
-        int * par_index; //Index of particles in cell
+        int * par; //Index of particles in cell
         int n_par; //Number of particles in cell
         int cap;
 }center_mass;
@@ -158,6 +158,15 @@ void calc_center_mass(center_mass ** cm, long long num_particles, particle_t* pa
                 cm[j][i].Y /= cm[j][i].M;
             }
         }
+
+    // Cleanup locks
+    for (int i = 0; i < grid_size; i++) {
+        for (int j = 0; j < grid_size; j++) {
+            omp_destroy_lock(&center_locks[i][j]);
+        }
+        free(center_locks[i]);
+    }
+    free(center_locks);
 }
 
 void grid_calculation(center_mass ** cm, long long num_particles, double cell_size, particle_t *par, long grid_size){
@@ -196,11 +205,6 @@ void grid_calculation(center_mass ** cm, long long num_particles, double cell_si
                 if (cm[wrapped_x][wrapped_y].n_par >= cm[wrapped_x][wrapped_y].cap - 1) {
                     const int new_cap = cm[wrapped_x][wrapped_y].cap * 2;
                     int *temp = realloc(cm[wrapped_x][wrapped_y].par_index, new_cap * sizeof(int));
-                    if (!temp) {
-                        fprintf(stderr, "Realloc failed for grid cell [%d][%d]\n", wrapped_x, wrapped_y);
-                        omp_unset_lock(&grid_locks[wrapped_x][wrapped_y]);
-                        continue;
-                    }
                     cm[wrapped_x][wrapped_y].par_index = temp;
                     cm[wrapped_x][wrapped_y].cap = new_cap;
                 }
@@ -448,7 +452,6 @@ int main(int argc, char *argv[]){
     long long num_timesteps = atoll(argv[5]);
 
     particle_t* particles = malloc(num_particles * sizeof(particle_t));
-    
     init_particles(sseed, space_size, grid_size, num_particles, particles);
     exec_time = -omp_get_wtime();
     
