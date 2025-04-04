@@ -158,6 +158,15 @@ void calc_center_mass(center_mass ** cm, long long num_particles, particle_t* pa
                 cm[j][i].Y /= cm[j][i].M;
             }
         }
+
+    // Cleanup locks
+    for (int i = 0; i < grid_size; i++) {
+        for (int j = 0; j < grid_size; j++) {
+            omp_destroy_lock(&center_locks[i]);
+        }
+        free(center_locks[i]);
+    }
+    free(center_locks);
 }
 
 void grid_calculation(center_mass ** cm, long long num_particles, double cell_size, particle_t *par, long grid_size){
