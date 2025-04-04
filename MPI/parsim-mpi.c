@@ -375,29 +375,6 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                }else if(rank == psize - 1 && new_cell < -work_size[rank-1]-work_size[rank-2]){
-
-                    to_send_next_next.par[to_send_next_next.n_particles].id = st_par[cell].par[id_par].id;
-                    to_send_next_next.par[to_send_next_next.n_particles].x = st_par[cell].par[id_par].x;
-                    to_send_next_next.par[to_send_next_next.n_particles].y = st_par[cell].par[id_par].y;
-                    to_send_next_next.par[to_send_next_next.n_particles].vx = st_par[cell].par[id_par].vx;
-                    to_send_next_next.par[to_send_next_next.n_particles].vy = st_par[cell].par[id_par].vy;
-                    to_send_next_next.par[to_send_next_next.n_particles].m = st_par[cell].par[id_par].m;
-                    to_send_next_next.par[to_send_next_next.n_particles].alive = st_par[cell].par[id_par].alive;
-
-                    if(to_send_next_next.par[to_send_next_next.n_particles].alive == 0){
-                        printf("CONA\n");
-                    } 
-
-                    to_send_next_next.n_particles ++;
-
-                    
-                    if(to_send_next_next.n_particles == to_send_next_next.size){
-                        to_send_next_next.par = realloc(to_send_next_next.par, to_send_next_next.size * 2 * sizeof(particle_t));
-                        to_send_next_next.size *= 2;
-                    }
-
-   
                 }else if(rank == psize-1 && new_cell + start_point < work_size[0]){
 
                     to_send_next.par[to_send_next.n_particles].id = st_par[cell].par[id_par].id;
@@ -418,6 +395,27 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     if(to_send_next.n_particles == to_send_next.size){
                         to_send_next.par = realloc(to_send_next.par, to_send_next.size * 2 * sizeof(particle_t));
                         to_send_next.size *= 2;
+                    }
+                }else if(rank == psize - 1 && new_cell + start_point < work_size[0] + work_size[1]){
+
+                    to_send_next_next.par[to_send_next_next.n_particles].id = st_par[cell].par[id_par].id;
+                    to_send_next_next.par[to_send_next_next.n_particles].x = st_par[cell].par[id_par].x;
+                    to_send_next_next.par[to_send_next_next.n_particles].y = st_par[cell].par[id_par].y;
+                    to_send_next_next.par[to_send_next_next.n_particles].vx = st_par[cell].par[id_par].vx;
+                    to_send_next_next.par[to_send_next_next.n_particles].vy = st_par[cell].par[id_par].vy;
+                    to_send_next_next.par[to_send_next_next.n_particles].m = st_par[cell].par[id_par].m;
+                    to_send_next_next.par[to_send_next_next.n_particles].alive = st_par[cell].par[id_par].alive;
+
+                    if(to_send_next_next.par[to_send_next_next.n_particles].alive == 0){
+                        printf("CONA\n");
+                    } 
+
+                    to_send_next_next.n_particles ++;
+
+                    
+                    if(to_send_next_next.n_particles == to_send_next_next.size){
+                        to_send_next_next.par = realloc(to_send_next_next.par, to_send_next_next.size * 2 * sizeof(particle_t));
+                        to_send_next_next.size *= 2;
                     }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
@@ -464,7 +462,7 @@ void cell_calculation(parcell* st_par, long grid_size, double space_size, int t)
                     }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-                }else if(new_cell > work_size[rank] + work_size[rank + 1]-1){
+                }else if(new_cell > work_size[rank] + work_size[rank + 1]){
 
                     to_send_next_next.par[to_send_next_next.n_particles].id = st_par[cell].par[id_par].id;
                     to_send_next_next.par[to_send_next_next.n_particles].x = st_par[cell].par[id_par].x;
